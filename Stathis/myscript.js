@@ -242,15 +242,23 @@ hole3.position.z = 0;
 hole3.rotation.x = Math.PI / 2;
 */
 
-
 scene.add( hole1 );
 scene.add( hole2 );
 //scene.add( hole3 );
 
 
 
-////////////////////////////////////////////////////
+var gDetectCir = new THREE.CircleGeometry( 4, 32 );
+var mDetectCir = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
+var detectCir = new THREE.Mesh( gDetectCir, mDetectCir );
+detectCir.rotation.x = Math.PI / 1;
+detectCir.position.z = -0.5;
 
+scene.add( detectCir );
+
+
+////////////////////////////////////////////////////
+///////////////// PHYSICAL ANIMATION
 
 
 // create the sphere and torus material
@@ -288,6 +296,7 @@ world.broadphase = new CANNON.NaiveBroadphase();
 
 // a simple one is available in the library
 var mass = 10;
+var mass1 = 10;
 
 //////////BALL/////////////
 var sphereShape = new CANNON.Sphere(radius);    // Step 1
@@ -297,10 +306,11 @@ sphereBody.position.set(0,50,0);
 world.add(sphereBody);                          // Step 3
 
 //////////////HOLE//////////////
-var torusShape = new CANNON.Trimesh.createTorus(radius1);    // Step 1
-var torusBody = new CANNON.Body({mass: mass}); // Step 2
+var torusShape = new CANNON.Trimesh.createTorus(radius1, tube, radialSegments, tubularSegments);    // Step 1
+var torusBody = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody.addShape(torusShape);
-torusBody.position.set(5,0,0);
+torusBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
+torusBody.position.set(3,0,0);
 world.add(torusBody);                          // Step 3
 
 
@@ -318,12 +328,13 @@ scene.add( plane );
 // ... you need some transformation here ...
 
 torus.rotation.set(Math.PI/2, 0, 0);
-torus.position.set(0, 3, 1);
+torus.position.set(3, 0, 0);
 plane.position.set(0, 0, 0);
 plane.rotation.set(Math.PI/2, 0, 0);
 
 var timeStep = 1.0 / 60.0;   // seconds
-	
+
+detectCir.parent = torus;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -345,6 +356,7 @@ controls.update();
 
 // The animate function: called every frame
 var iFrame = 0;
+
 function animate()
 {
 	requestAnimationFrame(animate);
@@ -361,6 +373,19 @@ cube.rotation.y += 0.006;
   // toru.position.y = torusBody.position.y;
   // toru.position.z = torusBody.position.z;
    // ... 
+
+
+	// Collision bettween ball and hole
+	var bCollideFloor = (sphere.position.y < 2) && (sphere.position.y > -2);
+
+    if (bCollideFloor)
+    {
+        torus.material.color.setHex(0xFF0000);
+    }
+    else
+    {
+        torus.material.color.setHex(0x9017A9);      
+    }
 
 
     iFrame++
