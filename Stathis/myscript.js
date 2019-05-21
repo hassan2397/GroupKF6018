@@ -248,43 +248,11 @@ scene.add( hole2 );
 
 
 
-var gDetectCir = new THREE.CircleGeometry( 4, 32 );
-var mDetectCir = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
-var detectCir = new THREE.Mesh( gDetectCir, mDetectCir );
-detectCir.rotation.x = Math.PI / 1;
-detectCir.position.z = -0.5;
-
-scene.add( detectCir );
-
 
 ////////////////////////////////////////////////////
 ///////////////// PHYSICAL ANIMATION
 
-
-// create the sphere and torus material
-var sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x00AACC });// Earth
-var torusMaterial = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-
-// set up the sphere and torus vars
-var radius = 2, segments = 16, rings = 16;
-var radius1 = 5, tube = 2.5, radialSegments = 3, tubularSegments = 100;
-
-
-// create a new mesh with sphere geometry -
-var sphere = new THREE.Mesh(
-   new THREE.SphereGeometry(radius, segments, rings),
-   sphereMaterial);
-
-// create a new mesh with torus geometry -
-var torus = new THREE.Mesh(
-   new THREE.TorusGeometry(radius1, tube, radialSegments, tubularSegments),
-   torusMaterial);
-
-// add the sphere to the scene
-scene.add(sphere);
-scene.add(torus);
-
-// Cannon
+  // Cannon
 var world = new CANNON.World();
 world.gravity.set(0,-9.82,0);   // set gravity in negative y direction
 
@@ -298,22 +266,7 @@ world.broadphase = new CANNON.NaiveBroadphase();
 var mass = 10;
 var mass1 = 10;
 
-//////////BALL/////////////
-var sphereShape = new CANNON.Sphere(radius);    // Step 1
-var sphereBody = new CANNON.Body({mass: mass}); // Step 2
-sphereBody.addShape(sphereShape);
-sphereBody.position.set(0,50,0);
-world.add(sphereBody);                          // Step 3
-
-//////////////HOLE//////////////
-var torusShape = new CANNON.Trimesh.createTorus(radius1, tube, radialSegments, tubularSegments);    // Step 1
-var torusBody = new CANNON.Body({mass1: mass1}); // Step 2
-torusBody.addShape(torusShape);
-torusBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody.position.set(3,0,0);
-world.add(torusBody);                          // Step 3
-
-
+//////////////FLOOR///////////////
 var plane = new CANNON.Plane();
 var groundBody = new CANNON.Body({ mass: 0});
 groundBody.addShape(plane);
@@ -324,17 +277,63 @@ world.add(groundBody);
 var geometry = new THREE.PlaneGeometry(200,200,1,1);   // xy plane
 var gMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
 var plane = new THREE.Mesh( geometry, gMaterial );
-scene.add( plane );
-// ... you need some transformation here ...
-
-torus.rotation.set(Math.PI/2, 0, 0);
-torus.position.set(3, 0, 0);
 plane.position.set(0, 0, 0);
 plane.rotation.set(Math.PI/2, 0, 0);
+scene.add( plane );
 
 var timeStep = 1.0 / 60.0;   // seconds
 
-detectCir.parent = torus;
+// create the sphere and torus material
+var sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x00AACC });// Earth
+var torusMaterial = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
+
+// set up the sphere and torus vars
+var radius = 2, segments = 16, rings = 16;
+var radius1 = 5, tube = 2.5, radialSegments = 3, tubularSegments = 100;
+
+// create a new mesh with sphere geometry -
+var sphere = new THREE.Mesh(
+   new THREE.SphereGeometry(radius, segments, rings),
+   	sphereMaterial);
+	scene.add(sphere);
+
+// create a new mesh with torus geometry -
+var torus = new THREE.Mesh(
+   new THREE.TorusGeometry(radius1, tube, radialSegments, tubularSegments),
+   torusMaterial);
+   	torus.rotation.set(Math.PI/2, 0, 0);
+   	torus.position.set(2, 0, -30);
+	scene.add(torus);
+/*
+var gDetectCir = new THREE.CircleGeometry( 4, 32 );
+var mDetectCir = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
+var detectCir = new THREE.Mesh( gDetectCir, mDetectCir );
+detectCir.rotation.x = Math.PI / 1;
+detectCir.position.set(10, -40, -0.5);
+//detectCir.position.x = 0;
+scene.add( detectCir );
+*/
+
+
+//////////BALL/////////////
+var sphereShape = new CANNON.Sphere(radius);    // Step 1
+var sphereBody = new CANNON.Body({mass: mass}); // Step 2
+sphereBody.addShape(sphereShape);
+sphereBody.position.set(0,0,-20);
+world.add(sphereBody);                          // Step 3
+
+//////////////HOLE//////////////
+var torusShape = new CANNON.Trimesh.createTorus(radius1, tube, radialSegments, tubularSegments);    // Step 1
+var torusBody = new CANNON.Body({mass1: mass1}); // Step 2
+torusBody.addShape(torusShape);
+torusBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
+torusBody.position.set(2,0,-30);
+world.add(torusBody);                          // Step 3
+
+
+//detectCir.parent = torus;
+
+//sphereBody.parent = sphere;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -369,24 +368,28 @@ cube.rotation.y += 0.006;
    sphere.position.x = sphereBody.position.x;
    sphere.position.y = sphereBody.position.y;
    sphere.position.z = sphereBody.position.z;
-   //toru.position.x = torusBody.position.x;
-  // toru.position.y = torusBody.position.y;
-  // toru.position.z = torusBody.position.z;
-   // ... 
+   
+/*
+ 	// Collision between 
+	var fDistanceBetweenBallnTarget = Math.sqrt(  
+	(sphere.position.x - detectCir.position.x) * (sphere.position.x - detectCir.position.x) +
+	(sphere.position.y - detectCir.position.y) * (sphere.position.y - detectCir.position.y) +
+	(sphere.position.z - detectCir.position.z) * (sphere.position.z - detectCir.position.z)
+    );
+
+    var fSumOfRadius = 2 + 1;
+    var bCollideBalls = fDistanceBetweenBallnTarget < fSumOfRadius;
 
 
 	// Collision bettween ball and hole
-	var bCollideFloor = (sphere.position.y < 2) && (sphere.position.y > -2);
+	//var bCollideFloor = (sphere.position.y < 2) && (sphere.position.y > -2);
 
-    if (bCollideFloor)
+    if (bCollideBalls)
     {
         torus.material.color.setHex(0xFF0000);
     }
-    else
-    {
-        torus.material.color.setHex(0x9017A9);      
-    }
-
+  
+*/
 
     iFrame++
 /*
@@ -402,6 +405,11 @@ cube.rotation.y += 0.006;
 animate();
 
 
+/////////////////////////////////////////////////////////
+///////////////////////////BOWLING ALLEY
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Kinectron codes starting from here///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -410,7 +418,8 @@ animate();
 // Initialize kinectron
 kinectron = new Kinectron("192.168.60.56"); // Define and create an instance of kinectron
 kinectron.makeConnection(); // Create connection between remote and application
-kinectron.startTrackedBodies(getBodies); // Start tracked bodies and set callbac
+kinectron.startTrackedBodies(getBodies); // Start tracked bodies and set callback
+
 
 
 //kinectron = new Kinectron(); // Define and create an instance of kinectron
@@ -428,6 +437,18 @@ var gRH= new THREE.SphereGeometry(0.1, 18, 18);
 var mRH = new THREE.MeshPhongMaterial( { color: 0x00CCCC } ); 
 var meshRH = new THREE.Mesh(gRH, mRH);
 scene.add(meshRH);
+
+var gLL= new THREE.SphereGeometry(0.1, 18, 18);
+var mLL = new THREE.MeshPhongMaterial( { color: 0xCCCCCC } ); 
+var meshLL = new THREE.Mesh(gLL, mLL);
+scene.add(meshLL);
+
+// Add a ball for the right hand
+var gRL= new THREE.SphereGeometry(0.1, 18, 18);
+var mRL = new THREE.MeshPhongMaterial( { color: 0x00CCCC } ); 
+var meshRL = new THREE.Mesh(gRL, mRL);
+scene.add(meshRL);
+
 
 // Draw a line with 4 points
 var mLine = new THREE.LineBasicMaterial({color: 0xff9999});
