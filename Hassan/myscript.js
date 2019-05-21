@@ -101,16 +101,17 @@ scene.add(targetTorso);
 targetTorso.scale.set(2,2,2);
 
 //Target Head
-var gTargetHead = new THREE.CircleGeometry(0.6,20);
-var mTargetHead = new THREE.MeshPhongMaterial( {color: 0x666666});
+var gTargetHead = new THREE.SphereGeometry(0.6,20);
+var mTargetHead = new THREE.MeshBasicMaterial( {color: 0x666666});
 var targetHead = new THREE.Mesh(gTargetHead, mTargetHead);
 targetHead.position.y = 1.0;
 targetHead.position.z = 0.05;
 scene.add(targetHead);
+targetHead.scale.set(1,1,0);
 
 // Target 2
 var gTargetTorso2 = new THREE.PlaneGeometry(1.25, 2);
-var mTargetTorso2 = new THREE.MeshPhongMaterial( {color: 0xAAAAAA, side: THREE.DoubleSide,} );
+var mTargetTorso2 = new THREE.MeshBasicMaterial( {color: 0xAAAAAA, side: THREE.DoubleSide,} );
 var targetTorso2 = new THREE.Mesh(gTargetTorso2, mTargetTorso2);
 targetTorso2.position.z = backWall.position.z+1;
 targetTorso2.position.y = 10;
@@ -118,12 +119,13 @@ scene.add(targetTorso2);
 targetTorso2.scale.set(2,2,2);
 
 //Target Head 2
-var gTargetHead2 = new THREE.CircleGeometry(0.6,20);
-var mTargetHead2 = new THREE.MeshPhongMaterial( {color: 0x666666});
+var gTargetHead2 = new THREE.SphereGeometry(0.6,20);
+var mTargetHead2 = new THREE.MeshBasicMaterial( {color: 0x666666});
 var targetHead2 = new THREE.Mesh(gTargetHead2, mTargetHead2);
 targetHead2.position.y = 1.0;
 targetHead2.position.z = 0.05;
 scene.add(targetHead2);
+targetHead2.scale.set(1,1,0);
 
 //parent child relationship between target head and torso
 targetHead.parent = targetTorso; 
@@ -162,9 +164,8 @@ function onSpacePressed() {
 }
 */
 
-
 //speed of the bullets
-var speed = 15;
+var speed = 200;
 //clock 
 var clock = new THREE.Clock();
 //fire boolean flag
@@ -184,7 +185,6 @@ var fire = false;
 	renderer.render(scene, camera);
 })()
 
-
 //variable to store the time of collision between each target and a bullet
 var lastTimeCollidedTarget1 = 0;
 var lastTimeCollidedTarget2 = 0;
@@ -195,8 +195,12 @@ var bulletRadiusDistance = 40;
 var bCollideTarget;
 var bCollideTarget2;
 
-//score of the shooting minigame
+//holds the score when hooting the targets
 var shootingScore = 0;
+
+// create an AudioListener and add it to the camera
+var listener = new THREE.AudioListener();
+camera.add( listener );
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,6 +243,20 @@ function animate()
 	bulletLH.quaternion.copy(weaponLH.quaternion); // apply the camera's quaternion
 	scene.add(bulletLH);
 	bulletsLH.push(bulletLH);
+	
+// create a global audio source
+var sound = new THREE.Audio( listener );
+
+// load a sound and set it as the Audio object's buffer
+var audioLoader = new THREE.AudioLoader();
+
+	//play a sound if the gun fires
+	audioLoader.load( 'sounds/Gun+Shot2.ogg', function( buffer ) {
+		sound.setBuffer( buffer );
+		sound.setLoop( true );
+		sound.setVolume(1);
+		sound.play();
+	});
 
 }
 
@@ -285,7 +303,7 @@ function animate()
 			//increment score
 			shootingScore +=1;
 		}
-		else if(targetTorso.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided1 > 60)
+		else if(targetTorso.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided1 > 100)
 		{
 			 targetTorso.material.color.setHex(0xAAAAAA);
 		}
@@ -299,7 +317,7 @@ function animate()
 			//increment score
 			shootingScore +=1;
 		}
-		else if(targetTorso2.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided2 > 60)
+		else if(targetTorso2.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided2 > 100)
 		{
 			 targetTorso2.material.color.setHex(0xAAAAAA);
 		}
@@ -361,20 +379,6 @@ kinectron.startTrackedBodies(getBodies); // Start tracked bodies and set callbac
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-/*
-// Add a ball for the left hand
-var gLH= new THREE.SphereGeometry(0.2, 18, 18);
-var mLH = new THREE.MeshPhongMaterial( { color: 0xFF0000 } ); 
-var meshLH = new THREE.Mesh(gLH, mLH);
-scene.add(meshLH);
-
-// Add a ball for the right hand
-var gRH= new THREE.SphereGeometry(0.2, 18, 18);
-var mRH = new THREE.MeshPhongMaterial( { color: 0x00CCCC } ); 
-var meshRH = new THREE.Mesh(gRH, mRH);
-scene.add(meshRH);
-*/
-
 // Add a ball for the head
 var gHead= new THREE.SphereGeometry(0.2, 18, 18);
 var mHead = new THREE.MeshStandardMaterial( { color: 0x000000, metalness: 0.75, emissive: "grey"} ); 
@@ -399,6 +403,14 @@ var mRF = new THREE.MeshStandardMaterial( { color: 0x000000, metalness: 0.75, em
 var meshRF= new THREE.Mesh(gRF, mRF);
 scene.add(meshRF);
 
+//Store last quaternions of right hand
+var v4LastQuatRH = new Array(5);
+for (var i=0; i<5; i++)
+{
+	v4LastQuatRH[i] = new THREE.Vector4(0, 0, 0, 0);
+}
+//store the filtered quaternion of the joint
+var meshFilteredRHQuat = new THREE.Vector4(0,0,0,0);
 
 // The getBodies callback function: called once every time kinect obtain a frame
 function getBodies(skeleton) 
@@ -431,31 +443,50 @@ function getBodies(skeleton)
 	meshRF.position.z = skeleton.joints[kinectron.FOOTRIGHT].cameraZ;
 	
 	//weapon tracking onto kinect joints
-	weaponRH.quaternion.set(
-	skeleton.joints[kinectron.HANDRIGHT].orientationX,
-	skeleton.joints[kinectron.HANDRIGHT].orientationY,
-	skeleton.joints[kinectron.HANDRIGHT].orientationZ,
-	skeleton.joints[kinectron.HANDRIGHT].orientationW);
+	weaponRH.quaternion.copy(meshFilteredRHQuat);
 	
-	weaponLH.quaternion.set(
-	skeleton.joints[kinectron.HANDRIGHT].orientationX,
-	skeleton.joints[kinectron.HANDRIGHT].orientationY,
-	skeleton.joints[kinectron.HANDRIGHT].orientationZ,
-	skeleton.joints[kinectron.HANDRIGHT].orientationW);
+	weaponLH.quaternion.copy(weaponRH.quaternion);
 	
 	weaponRH.position.x = skeleton.joints[kinectron.HANDRIGHT].cameraX +2;
 	weaponRH.position.y = skeleton.joints[kinectron.HANDRIGHT].cameraY;
 	weaponRH.position.z = skeleton.joints[kinectron.HANDRIGHT].cameraZ;
-
+	
 	weaponLH.position.x = skeleton.joints[kinectron.HANDLEFT].cameraX -2;
 	weaponLH.position.y = skeleton.joints[kinectron.HANDLEFT].cameraY;
-	weaponLH.position.z = skeleton.joints[kinectron.HANDLEFT].cameraZ;	
+	weaponLH.position.z = skeleton.joints[kinectron.HANDLEFT].cameraZ;
 	
-	
-	//filtering
-	
-	
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////FILTERING////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//Calculate the filtered orientation/quaternion (Gaussian filter)
+	meshFilteredRHQuat.x = (skeleton.joints[kinectron.HANDRIGHT].orientationX*0.382928 + v4LastQuatRH[0].x*0.241732 +
+							v4LastQuatRH[1].x*0.060598 + v4LastQuatRH[2].x*0.005977 + v4LastQuatRH[3].x*0.000229)
+							/(0.000229+0.005977+0.060598+0.241732+0.382928);
+	meshFilteredRHQuat.y = (skeleton.joints[kinectron.HANDRIGHT].orientationY*0.382928 + v4LastQuatRH[0].y*0.241732 +
+							v4LastQuatRH[1].y*0.060598 + v4LastQuatRH[2].y*0.005977 + v4LastQuatRH[3].y*0.000229)
+							/(0.000229+0.005977+0.060598+0.241732+0.382928);
+	meshFilteredRHQuat.z = (skeleton.joints[kinectron.HANDRIGHT].orientationZ*0.382928 + v4LastQuatRH[0].z*0.241732 +
+							v4LastQuatRH[1].z*0.060598 + v4LastQuatRH[2].z*0.005977 + v4LastQuatRH[3].z*0.000229)
+							/(0.000229+0.005977+0.060598+0.241732+0.382928);
+	meshFilteredRHQuat.w = (skeleton.joints[kinectron.HANDRIGHT].orientationW*0.382928 + v4LastQuatRH[0].w*0.241732 +
+							v4LastQuatRH[1].w*0.060598 + v4LastQuatRH[2].w*0.005977 + v4LastQuatRH[3].w*0.000229)
+							/(0.000229+0.005977+0.060598+0.241732+0.382928);
+
+	for (var i=4; i>0; i--)
+	{
+		v4LastQuatRH[i].x = v4LastQuatRH[i-1].x;
+		v4LastQuatRH[i].y = v4LastQuatRH[i-1].y;
+		v4LastQuatRH[i].z = v4LastQuatRH[i-1].z;
+		v4LastQuatRH[i].w = v4LastQuatRH[i-1].w;
+	}
+	v4LastQuatRH[0].x = skeleton.joints[kinectron.HANDRIGHT].orientationX;
+	v4LastQuatRH[0].y = skeleton.joints[kinectron.HANDRIGHT].orientationY;
+	v4LastQuatRH[0].z = skeleton.joints[kinectron.HANDRIGHT].orientationZ;
+	v4LastQuatRH[0].w = skeleton.joints[kinectron.HANDRIGHT].orientationW;
+
 
 //FPS camera 
 	//camera.up = new THREE.Vector3(0,0,1);
@@ -467,7 +498,6 @@ function getBodies(skeleton)
 	Math.pow((skeleton.joints[kinectron.FOOTLEFT].cameraY - skeleton.joints[kinectron.FOOTRIGHT].cameraY),2) +
 	Math.pow((skeleton.joints[kinectron.FOOTLEFT].cameraZ - skeleton.joints[kinectron.FOOTRIGHT].cameraZ),2));
 	
-	
 	//sum of radius between the right foot and left foot;
 	var fSumOfRadius = 0.25;
 
@@ -477,7 +507,6 @@ function getBodies(skeleton)
     }
 	else
 		fire = false;
-
 }
 
 /*
