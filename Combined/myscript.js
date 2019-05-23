@@ -5,7 +5,7 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.x = 0;
 camera.position.z = 120;
-camera.position.y = 30;
+camera.position.y = 100;
 camera.lookAt(0,0,0);
 
 // Render
@@ -287,6 +287,41 @@ plane.position.set(0, -1.5, 0);
 plane.rotation.set(Math.PI/2, 0, 0);
 scene.add( plane );
 
+//////////////BACKWALL GAME2///////////////
+var backWallG2C = new CANNON.Plane();
+var groundBodyG2C = new CANNON.Body({ mass: 0});
+groundBodyG2C.addShape(backWallG2C);
+groundBodyG2C.position.x = -50;
+groundBodyG2C.position.y = 8;
+groundBodyG2C.position.z = -28;
+world.add(groundBodyG2C);
+
+// add a ground backWallG2 to the scene
+var gbackWallG2 = new THREE.PlaneGeometry(30,20,1,1);   // xy backWallG2
+var mbackWallG2 = new THREE.MeshBasicMaterial( {color: 0xBB3300, side: THREE.DoubleSide, transparent: true, opacity: 0.5, metalness: 1.0, roughness: 0.8} );
+var backWallG2C = new THREE.Mesh( gbackWallG2, mbackWallG2 );
+backWallG2C.position.set(-50, 8, -28);
+scene.add( backWallG2C );
+
+//////////////SIDEWALL GAME2///////////////
+// var sideWallG2C = new CANNON.Plane();
+// var groundBodysideG2C = new CANNON.Body({ mass: 0});
+// groundBodysideG2C.addShape(sideWallG2C);
+// //groundBodysideG2C.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0),-Math.PI/2);
+// /////
+// groundBodysideG2C.position.x = -65;
+// groundBodysideG2C.position.y = 8;
+// groundBodysideG2C.position.z = -15.5;
+// world.add(groundBodysideG2C);
+
+// add a ground sideWallG2 to the scene
+var gsideWallG2 = new THREE.PlaneGeometry(25,20,1,1);   // xy sideWallG2
+var msideWallG2 = new THREE.MeshBasicMaterial( {color: 0xBB3300, side: THREE.DoubleSide, transparent: true, opacity: 0.5, metalness: 1.0, roughness: 0.8} );
+var sideWallG2C = new THREE.Mesh( gsideWallG2, msideWallG2 );
+sideWallG2C.position.set(-65, 8, -15.5);
+sideWallG2C.rotation.set(0, Math.PI/2, 0);
+scene.add( sideWallG2C );
+
 var timeStep = 1.0 / 60.0;   // seconds
 
 // create the sphere and torus material
@@ -316,7 +351,7 @@ var sphere1 = new THREE.Mesh(
 var sphereShape = new CANNON.Sphere(radius);    // Step 1
 var sphereBody = new CANNON.Body({mass: mass}); // Step 2
 sphereBody.addShape(sphereShape);
-sphereBody.position.set(0, 5, 0.9);
+sphereBody.position.set(-50, 25, -20.9);
 world.add(sphereBody); 							// Step 3
 
 /////////////////   TORUS TARGETS  //////////////////////////  
@@ -340,7 +375,7 @@ var torus = new THREE.Mesh(
    new THREE.TorusGeometry(radius0, tube, radialSegments, tubularSegments),
    torusMaterial);
    	torus.rotation.set(Math.PI/2, 0, 0);
- 	torus.position.set(0, -1.5, -12);
+ 	torus.position.set(-50, -1.6, -12);
 	scene.add(torus);
 
 //  torus cannon body
@@ -348,7 +383,7 @@ var torusShape = new CANNON.Trimesh.createTorus(radius0, tube, radialSegments, t
 var torusBody = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody.addShape(torusShape);
 torusBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody.position.set(0, -1.5, -12);
+torusBody.position.set(-50, -1.6, -12);
 world.add(torusBody);                          // Step 3
 
 //torus bottom for collision feedback
@@ -356,7 +391,7 @@ var gDetectCir = new THREE.CircleGeometry( 5, 32 );
 var mDetectCir = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir = new THREE.Mesh( gDetectCir, mDetectCir );
 detectCir.rotation.x = Math.PI / 2;
-detectCir.position.set(0, -1.5, -12);
+detectCir.position.set(-50, -1.6, -12);
 scene.add( detectCir );
 
 //-1-
@@ -365,7 +400,7 @@ var torus01 = new THREE.Mesh(
    new THREE.TorusGeometry(radius1, tube1, radialSegments1, tubularSegments1),
    torusMaterial1);
    	torus01.rotation.set(Math.PI/2, 0, 0);
- 	torus01.position.set(9, -1.25, -8);
+ 	torus01.position.set(-41, -1.6, -8);
 	scene.add(torus01);
 
 //torus cannon body
@@ -373,7 +408,7 @@ var torusShape1 = new CANNON.Trimesh.createTorus(radius1, tube1, radialSegments1
 var torusBody1 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody1.addShape(torusShape1);
 torusBody1.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody1.position.set(9, -1.25, -8);
+torusBody1.position.set(-41, -1.6, -8);
 world.add(torusBody1);                          // Step 3
 
 //torus bottom for collision feedback
@@ -381,7 +416,7 @@ var gDetectCir1 = new THREE.CircleGeometry( 3, 32 );
 var mDetectCir1 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir1 = new THREE.Mesh( gDetectCir1, mDetectCir1 );
 detectCir1.rotation.x = Math.PI / 2;
-detectCir1.position.set(9, -1.25, -8);
+detectCir1.position.set(-41, -1.6, -8);
 scene.add( detectCir1 );
 
 //-2-
@@ -390,7 +425,7 @@ var torus02 = new THREE.Mesh(
    new THREE.TorusGeometry(radius2, tube2, radialSegments2, tubularSegments2),
    torusMaterial2);
    	torus02.rotation.set(Math.PI/2, 0, 0);
- 	torus02.position.set(-9.5, -1.25, -6);
+ 	torus02.position.set(-59.5, -1.6, -6);
 	scene.add(torus02);
 
 //torus cannon body
@@ -398,7 +433,7 @@ var torusShape2 = new CANNON.Trimesh.createTorus(radius2, tube2, radialSegments2
 var torusBody2 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody2.addShape(torusShape2);
 torusBody2.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody2.position.set(-9.5, -1.25, -6);
+torusBody2.position.set(-59.5, -1.6, -6);
 world.add(torusBody2);                          // Step 3
 
 //torus bottom for collision feedback
@@ -406,7 +441,7 @@ var gDetectCir2 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir2 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir2 = new THREE.Mesh( gDetectCir2, mDetectCir2 );
 detectCir2.rotation.x = Math.PI / 2;
-detectCir2.position.set(-9.5, -1.25, -6);
+detectCir2.position.set(-59.5, -1.6, -6);
 scene.add( detectCir2 );
 
 //-3-
@@ -415,7 +450,7 @@ var torus03 = new THREE.Mesh(
    new THREE.TorusGeometry(radius3, tube3, radialSegments3, tubularSegments3),
    torusMaterial3);
    	torus03.rotation.set(Math.PI/2, 0, 0);
- 	torus03.position.set(-9.5, -1.25, -19);
+ 	torus03.position.set(-59.5, -1.6, -19);
 	scene.add(torus03);
 
 //torus cannon body
@@ -423,7 +458,7 @@ var torusShape3 = new CANNON.Trimesh.createTorus(radius3, tube3, radialSegments3
 var torusBody3 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody3.addShape(torusShape3);
 torusBody3.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody3.position.set(-9.5, -1.25, -19);
+torusBody3.position.set(-59.5, -1.6, -19);
 world.add(torusBody3);                          // Step 3
 
 //torus bottom for collision feedback
@@ -431,7 +466,7 @@ var gDetectCir3 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir3 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir3 = new THREE.Mesh( gDetectCir3, mDetectCir3 );
 detectCir3.rotation.x = Math.PI / 2;
-detectCir3.position.set(-9.5, -1.25, -19);
+detectCir3.position.set(-59.5, -1.6, -19);
 scene.add( detectCir3 );
 
 //-4-
@@ -440,7 +475,7 @@ var torus04 = new THREE.Mesh(
    new THREE.TorusGeometry(radius4, tube4, radialSegments4, tubularSegments4),
    torusMaterial4);
    	torus04.rotation.set(Math.PI/2, 0, 0);
- 	torus04.position.set(7.5, -1.25, -15);
+ 	torus04.position.set(-42.5, -1.6, -15);
 	scene.add(torus04);
 
 //torus cannon body
@@ -448,7 +483,7 @@ var torusShape4 = new CANNON.Trimesh.createTorus(radius4, tube4, radialSegments4
 var torusBody4 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody4.addShape(torusShape4);
 torusBody4.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody4.position.set(7.5, -1.25, -15);
+torusBody4.position.set(-42.5, -1.6, -15);
 world.add(torusBody4);                          // Step 3
 
 //torus bottom for collision feedback
@@ -456,7 +491,7 @@ var gDetectCir4 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir4 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir4 = new THREE.Mesh( gDetectCir4, mDetectCir4 );
 detectCir4.rotation.x = Math.PI / 2;
-detectCir4.position.set(7.5, -1.25, -15);
+detectCir4.position.set(-42.5, -1.6, -15);
 scene.add( detectCir4 );
 
 //-5-
@@ -465,7 +500,7 @@ var torus05 = new THREE.Mesh(
    new THREE.TorusGeometry(radius5, tube5, radialSegments5, tubularSegments5),
    torusMaterial5);
    	torus05.rotation.set(Math.PI/2, 0, 0);
- 	torus05.position.set(4.5, -1.25, -23);
+ 	torus05.position.set(-46.5, -1.6, -23);
 	scene.add(torus05);
 
 //torus cannon body
@@ -473,7 +508,7 @@ var torusShape5 = new CANNON.Trimesh.createTorus(radius5, tube5, radialSegments5
 var torusBody5 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody5.addShape(torusShape5);
 torusBody5.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody5.position.set(4.5, -1.25, -23);
+torusBody5.position.set(-46.5, -1.6, -23);
 world.add(torusBody5);                          // Step 3
 
 //torus bottom for collision feedback
@@ -481,7 +516,7 @@ var gDetectCir5 = new THREE.CircleGeometry( 5, 32 );
 var mDetectCir5 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir5 = new THREE.Mesh( gDetectCir5, mDetectCir5 );
 detectCir5.rotation.x = Math.PI / 2;
-detectCir5.position.set(4.5, -1.25, -23);
+detectCir5.position.set(-46.5, -1.6, -23);
 scene.add( detectCir5 );
 
 //-6-
@@ -490,7 +525,7 @@ var torus06 = new THREE.Mesh(
    new THREE.TorusGeometry(radius6, tube6, radialSegments6, tubularSegments6),
    torusMaterial6);
    	torus06.rotation.set(Math.PI/2, 0, 0);
- 	torus06.position.set(-2.2, -1.25, -20);
+ 	torus06.position.set(-52.8, -1.6, -19);
 	scene.add(torus06);
 
 //torus cannon body
@@ -498,7 +533,7 @@ var torusShape6 = new CANNON.Trimesh.createTorus(radius6, tube6, radialSegments6
 var torusBody6 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody6.addShape(torusShape6);
 torusBody6.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody6.position.set(-2.2, -1.25, -20);
+torusBody6.position.set(-52.8, -1.6, -20);
 world.add(torusBody6);                          // Step 3
 
 //torus bottom for collision feedback
@@ -506,7 +541,7 @@ var gDetectCir6 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir6 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir6 = new THREE.Mesh( gDetectCir6, mDetectCir6 );
 detectCir6.rotation.x = Math.PI / 2;
-detectCir6.position.set(-2.2, -1.25, -20);
+detectCir6.position.set(-52.8, -1.6, -20);
 scene.add( detectCir6 );
 
 //-7-
@@ -515,7 +550,7 @@ var torus07 = new THREE.Mesh(
    new THREE.TorusGeometry(radius7, tube7, radialSegments7, tubularSegments7),
    torusMaterial7);
    	torus07.rotation.set(Math.PI/2, 0, 0);
- 	torus07.position.set(-8, -1.25, -12);
+ 	torus07.position.set(-58, -1.6, -12);
 	scene.add(torus07);
 
 //torus cannon body
@@ -523,7 +558,7 @@ var torusShape7 = new CANNON.Trimesh.createTorus(radius7, tube7, radialSegments7
 var torusBody7 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody7.addShape(torusShape7);
 torusBody7.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody7.position.set(-8, -1.25, -12);
+torusBody7.position.set(-58, -1.6, -12);
 world.add(torusBody7);                          // Step 3
 
 //torus bottom for collision feedback
@@ -531,7 +566,7 @@ var gDetectCir7 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir7 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir7 = new THREE.Mesh( gDetectCir7, mDetectCir7 );
 detectCir7.rotation.x = Math.PI / 2;
-detectCir7.position.set(-8, -1.25, -12);
+detectCir7.position.set(-58, -1.6, -12);
 scene.add( detectCir7 );
 
 //-8-
@@ -540,7 +575,7 @@ var torus08 = new THREE.Mesh(
    new THREE.TorusGeometry(radius8, tube8, radialSegments8, tubularSegments8),
    torusMaterial8);
    	torus08.rotation.set(Math.PI/2, 0, 0);
- 	torus08.position.set(-12.5, -1.25, -12);
+ 	torus08.position.set(-62.5, -1.6, -12);
 	scene.add(torus08);
 
 //torus cannon body
@@ -548,7 +583,7 @@ var torusShape8 = new CANNON.Trimesh.createTorus(radius8, tube8, radialSegments8
 var torusBody8 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody8.addShape(torusShape8);
 torusBody8.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody8.position.set(-12.2, -1.25, -12);
+torusBody8.position.set(-62.5, -1.6, -12);
 world.add(torusBody8);                          // Step 3
 
 //torus bottom for collision feedback
@@ -556,7 +591,7 @@ var gDetectCir8 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir8 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir8 = new THREE.Mesh( gDetectCir8, mDetectCir8 );
 detectCir8.rotation.x = Math.PI / 2;
-detectCir8.position.set(-12.2, -1.25, -12);
+detectCir8.position.set(-62.5, -1.6, -12);
 scene.add( detectCir8 );
 
 //-9-
@@ -565,7 +600,7 @@ var torus09 = new THREE.Mesh(
    new THREE.TorusGeometry(radius9, tube9, radialSegments9, tubularSegments9),
    torusMaterial9);
    	torus09.rotation.set(Math.PI/2, 0, 0);
- 	torus09.position.set(13.5, -1.25, -15);
+ 	torus09.position.set(-36.5, -1.6, -15);
 	scene.add(torus09);
 
 //torus cannon body
@@ -573,7 +608,7 @@ var torusShape9 = new CANNON.Trimesh.createTorus(radius9, tube9, radialSegments9
 var torusBody9 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody9.addShape(torusShape9);
 torusBody9.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody9.position.set(13.5, -1.25, -15);
+torusBody9.position.set(-36.5, -1.6, -15);
 world.add(torusBody9);                          // Step 3
 
 //torus bottom for collision feedback
@@ -581,7 +616,7 @@ var gDetectCir9 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir9 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir9 = new THREE.Mesh( gDetectCir9, mDetectCir9 );
 detectCir9.rotation.x = Math.PI / 2;
-detectCir9.position.set(13.5, -1.25, -15 );
+detectCir9.position.set(-36.5, -1.6, -15 );
 scene.add( detectCir9 );
 
 
