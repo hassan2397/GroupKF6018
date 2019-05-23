@@ -188,21 +188,44 @@ target5.parent = wall1;
 ////////////////////////////////////////////////////
 ///////////////// PHYSICAL ANIMATION
 
+var mat = new CANNON.Material();
+
+
   // Cannon
 var world = new CANNON.World();
-world.gravity.set(0,-9.82,0);   // set gravity in negative y direction
+world.gravity.set(0, -2.82, 0);   // set gravity in negative y direction
 
 world.solver.iterations = 20; // Increase solver iterations (default is 10)
-world.solver.tolerance = 0.01;   // Force solver to use all iterations
+world.solver.tolerance = .01;   // Force solver to use all iterations
 
 // a simple one is available in the library
 world.broadphase = new CANNON.NaiveBroadphase();
 
+// Create contact material behaviour
+var mat_mat = new CANNON.ContactMaterial(mat, mat, { friction: 0.1, restitution: 0.7 });
+world.addContactMaterial(mat_mat);
+
+
 // mass weight var for sphere and torus
-var mass = 0.0005;
+var mass = 0.5;
 var mass1 = 10;
 
 //////////////FLOOR///////////////
+var plane = new CANNON.Plane();
+var groundBody = new CANNON.Body({ mass: 0});
+groundBody.addShape(plane);
+groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
+groundBody.position.y = -2;
+world.add(groundBody);
+
+// add a ground plane to the scene
+var geometry = new THREE.PlaneGeometry(200,200,1,1);   // xy plane
+var gMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+var plane = new THREE.Mesh( geometry, gMaterial );
+plane.position.set(0, -3, 0);
+plane.rotation.set(Math.PI/2, 0, 0);
+scene.add( plane );
+
 var plane = new CANNON.Plane();
 var groundBody = new CANNON.Body({ mass: 0});
 groundBody.addShape(plane);
@@ -224,16 +247,17 @@ var timeStep = 1.0 / 60.0;   // seconds
 
 // create the sphere and torus material
 var sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x00AACC });
-var torusMaterial = new THREE.MeshLambertMaterial({ color: 0x1C7FA9 });
-var torusMaterial1 = new THREE.MeshLambertMaterial({ color: 0xF10F0F });
-var torusMaterial2 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-var torusMaterial3 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-var torusMaterial4 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-var torusMaterial5 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-var torusMaterial6 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-var torusMaterial7 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-var torusMaterial8 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
-var torusMaterial9 = new THREE.MeshLambertMaterial({ color: 0x0A34E3 });
+
+var torusMaterial = new THREE.MeshLambertMaterial({ color: 0x1D71C1 });
+var torusMaterial1 = new THREE.MeshLambertMaterial({ color: 0xC7150C });
+var torusMaterial2 = new THREE.MeshLambertMaterial({ color: 0x6611A7 });
+var torusMaterial3 = new THREE.MeshLambertMaterial({ color: 0xB61736 });
+var torusMaterial4 = new THREE.MeshLambertMaterial({ color: 0x24AB15 });
+var torusMaterial5 = new THREE.MeshLambertMaterial({ color: 0xC79116 });
+var torusMaterial6 = new THREE.MeshLambertMaterial({ color: 0x18BAAA });
+var torusMaterial7 = new THREE.MeshLambertMaterial({ color: 0x874BC5 });
+var torusMaterial8 = new THREE.MeshLambertMaterial({ color: 0xC64384 });
+var torusMaterial9 = new THREE.MeshLambertMaterial({ color: 0x45C367 });
 
 
 // set up the sphere and torus vars
@@ -241,17 +265,48 @@ var radius = 0.70, segments = 16, rings = 16;
 
 // create a new mesh with sphere geometry -
 var sphere1 = new THREE.Mesh(
-    new THREE.SphereGeometry(radius, segments, rings),
-   	sphereMaterial);
-   	sphere1.position.set(0, 0, 0);
+    new THREE.SphereGeometry(radius, segments, rings),sphereMaterial);
+   	sphere1.position.set(0, 10, 0);
 	scene.add(sphere1);
 
 //sphere cannon body
 var sphereShape = new CANNON.Sphere(radius);    // Step 1
 var sphereBody = new CANNON.Body({mass: mass}); // Step 2
 sphereBody.addShape(sphereShape);
-sphereBody.position.set(0, 10, 0.9);
+sphereBody.position.set(0, 5, 0.9);
 world.add(sphereBody); 							// Step 3
+
+/*
+var iNumberBalls=10;
+
+var geoArrayBall=[];
+var matArrayBall=[];
+var meshArrayBall=[];
+
+var SphereCannonArray=[];
+var SphereBodyArray=[];
+
+var massArray=[];
+massArray=0.5;
+
+for (var i=0; i<iNumberBalls;i++)
+{
+	geoArrayBall.push(new THREE.SphereGeometry(radius,segments,rings));
+	matArrayBall.push(new THREE.MeshPhongMaterial({color:0xFFFF00}));
+	meshArrayBall.push(new THREE.Mesh(geoArrayBall[i],matArrayBall));
+    scene.add(meshArrayBall[i]);
+
+	SphereCannonArray.push(new CANNON.Sphere(radius));
+	SphereBodyArray.push(new CANNON.Body({mass:massArray[i]}));
+ 	SphereBodyArray[i].addShape(SphereCannonArray[i]);
+	SphereBodyArray[i].position.set(0,50,0.9);
+
+	world.add(SphereBodyArray[i]);
+
+
+}
+
+*/
    
 /////////////////   TORUS TARGETS  //////////////////////////  
 
@@ -288,11 +343,11 @@ torusBody.position.set(0, -2, -12);
 world.add(torusBody);                          // Step 3
 
 //torus bottom for collision feedback
-var gDetectCir = new THREE.CircleGeometry( 4, 32 );
+var gDetectCir = new THREE.CircleGeometry( 5, 32 );
 var mDetectCir = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir = new THREE.Mesh( gDetectCir, mDetectCir );
 detectCir.rotation.x = Math.PI / 2;
-detectCir.position.set(0, -1.2, -12);
+detectCir.position.set(0, -2, -12);
 scene.add( detectCir );
 
 //-1-
@@ -309,15 +364,15 @@ var torusShape1 = new CANNON.Trimesh.createTorus(radius1, tube1, radialSegments1
 var torusBody1 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody1.addShape(torusShape1);
 torusBody1.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody1.position.set(9.5, -2, 9);
+torusBody1.position.set(9, -2, -8);
 world.add(torusBody1);                          // Step 3
 
 //torus bottom for collision feedback
-var gDetectCir1 = new THREE.CircleGeometry( 4, 32 );
+var gDetectCir1 = new THREE.CircleGeometry( 3, 32 );
 var mDetectCir1 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir1 = new THREE.Mesh( gDetectCir1, mDetectCir1 );
 detectCir1.rotation.x = Math.PI / 2;
-detectCir1.position.set(9.5, -1.2, 9);
+detectCir1.position.set(9, -2, -8);
 scene.add( detectCir1 );
 
 //-2-
@@ -334,7 +389,7 @@ var torusShape2 = new CANNON.Trimesh.createTorus(radius2, tube2, radialSegments2
 var torusBody2 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody2.addShape(torusShape2);
 torusBody2.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody2.position.set(-9.5, -2, -9);
+torusBody2.position.set(-9.5, -2, -6);
 world.add(torusBody2);                          // Step 3
 
 //torus bottom for collision feedback
@@ -342,7 +397,7 @@ var gDetectCir2 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir2 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir2 = new THREE.Mesh( gDetectCir2, mDetectCir2 );
 detectCir2.rotation.x = Math.PI / 2;
-detectCir2.position.set(-9.5, -1.2, -9);
+detectCir2.position.set(-9.5, -1.5, -6);
 scene.add( detectCir2 );
 
 //-3-
@@ -413,7 +468,7 @@ torusBody5.position.set(4.5, -2, -23);
 world.add(torusBody5);                          // Step 3
 
 //torus bottom for collision feedback
-var gDetectCir5 = new THREE.CircleGeometry( 4, 32 );
+var gDetectCir5 = new THREE.CircleGeometry( 5, 32 );
 var mDetectCir5 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir5 = new THREE.Mesh( gDetectCir5, mDetectCir5 );
 detectCir5.rotation.x = Math.PI / 2;
@@ -484,7 +539,7 @@ var torusShape8 = new CANNON.Trimesh.createTorus(radius8, tube8, radialSegments8
 var torusBody8 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody8.addShape(torusShape8);
 torusBody8.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody8.position.set(-2.2, -2, -20);
+torusBody8.position.set(-12.2, -2, -12);
 world.add(torusBody8);                          // Step 3
 
 //torus bottom for collision feedback
@@ -492,7 +547,7 @@ var gDetectCir8 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir8 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir8 = new THREE.Mesh( gDetectCir8, mDetectCir8 );
 detectCir8.rotation.x = Math.PI / 2;
-detectCir8.position.set(-2.2, -2, -20);
+detectCir8.position.set(-12.2, -2, -12);
 scene.add( detectCir8 );
 
 //-9-
@@ -509,7 +564,7 @@ var torusShape9 = new CANNON.Trimesh.createTorus(radius9, tube9, radialSegments9
 var torusBody9 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody9.addShape(torusShape9);
 torusBody9.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody9.position.set(15, -2, -20);
+torusBody9.position.set(13.5, -2, -15);
 world.add(torusBody9);                          // Step 3
 
 //torus bottom for collision feedback
@@ -517,13 +572,8 @@ var gDetectCir9 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir9 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir9 = new THREE.Mesh( gDetectCir9, mDetectCir9 );
 detectCir9.rotation.x = Math.PI / 2;
-detectCir9.position.set(-2.2, -2, -20);
+detectCir9.position.set(13.5, -2, -15 );
 scene.add( detectCir9 );
-
-
-
-
-
 
 
 /////////////////////////////////////
@@ -577,7 +627,7 @@ cube.rotation.y += 0.006;
   	sphere1.position.y = sphereBody.position.y;
   	sphere1.position.z = sphereBody.position.z;
 
-
+  // -0-
  	// Collision between sphere and torus target 
 	var fDistanceBetweenBallnTarget = Math.sqrt(  
 	(sphere1.position.x - detectCir.position.x) * (sphere1.position.x - detectCir.position.x) +
@@ -585,61 +635,167 @@ cube.rotation.y += 0.006;
 	(sphere1.position.z - detectCir.position.z) * (sphere1.position.z - detectCir.position.z)
     );
 
-    var fSumOfRadius = 0.1 + 1;
+    var fSumOfRadius = 0.5 + 1;
     var bCollideBallsNtorus = fDistanceBetweenBallnTarget < fSumOfRadius;
-
-
 
     if (bCollideBallsNtorus)
     {
-        torus.material.color.setHex(0x04ACF5);
+        torus.material.color.setHex(0x88C1F7);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-  /*
-	// Collision between sphere and foot  
-	var fDistanceBetweenBallNfoot = Math.sqrt(  
-	(meshRF.position.x - sphere1.position.x) * (meshRF.position.x - sphere1.position.x) +
-	(meshRF.position.y - sphere1.position.y) * (meshRF.position.y - sphere1.position.y) +
-	(meshRF.position.z - sphere1.position.z) * (meshRF.position.z - sphere1.position.z)
+  //-1-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget1 = Math.sqrt(  
+	(sphere1.position.x - detectCir1.position.x) * (sphere1.position.x - detectCir1.position.x) +
+	(sphere1.position.y - detectCir1.position.y) * (sphere1.position.y - detectCir1.position.y) +
+	(sphere1.position.z - detectCir1.position.z) * (sphere1.position.z - detectCir1.position.z)
     );
 
-    var fSumOfRadius1 = 0.5 + 0.2;
-    var bCollideBallsNfoot = fDistanceBetweenBallNfoot < fSumOfRadius1;
+    var fSumOfRadius1 = 0.5 + 1;
+    var bCollideBallsNtorus1 = fDistanceBetweenBallnTarget1 < fSumOfRadius1;
 
-
-
-    if (bCollideBallsNfoot)
+    if (bCollideBallsNtorus1)
     {
-        sphere1.material.color.setHex(0xFF0000);
-
+        torus01.material.color.setHex(0xF80C00);
     }
-    else
+
+ //-2-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget2 = Math.sqrt(  
+	(sphere1.position.x - detectCir2.position.x) * (sphere1.position.x - detectCir2.position.x) +
+	(sphere1.position.y - detectCir2.position.y) * (sphere1.position.y - detectCir2.position.y) +
+	(sphere1.position.z - detectCir2.position.z) * (sphere1.position.z - detectCir2.position.z)
+    );
+
+    var fSumOfRadius2 = 0.5 + 1;
+    var bCollideBallsNtorus2 = fDistanceBetweenBallnTarget2 < fSumOfRadius2;
+
+    if (bCollideBallsNtorus2)
     {
-        sphere1.material.color.setHex(0x00AACC);
-
+        torus02.material.color.setHex(0xCB8AFC);
     }
-    */
+
+ //-3-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget3 = Math.sqrt(  
+	(sphere1.position.x - detectCir3.position.x) * (sphere1.position.x - detectCir3.position.x) +
+	(sphere1.position.y - detectCir3.position.y) * (sphere1.position.y - detectCir3.position.y) +
+	(sphere1.position.z - detectCir3.position.z) * (sphere1.position.z - detectCir3.position.z)
+    );
+
+    var fSumOfRadius3 = 0.5 + 1;
+    var bCollideBallsNtorus3 = fDistanceBetweenBallnTarget3 < fSumOfRadius3;
+
+    if (bCollideBallsNtorus3)
+    {
+        torus03.material.color.setHex(0xFB0333);
+    }
+
+ //-4-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget4 = Math.sqrt(  
+	(sphere1.position.x - detectCir4.position.x) * (sphere1.position.x - detectCir4.position.x) +
+	(sphere1.position.y - detectCir4.position.y) * (sphere1.position.y - detectCir4.position.y) +
+	(sphere1.position.z - detectCir4.position.z) * (sphere1.position.z - detectCir4.position.z)
+    );
+
+    var fSumOfRadius4 = 0.5 + 1;
+    var bCollideBallsNtorus4 = fDistanceBetweenBallnTarget4 < fSumOfRadius4;
+
+    if (bCollideBallsNtorus4)
+    {
+        torus04.material.color.setHex(0x93FE87);
+    }
+
+ //-5-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget5 = Math.sqrt(  
+	(sphere1.position.x - detectCir5.position.x) * (sphere1.position.x - detectCir5.position.x) +
+	(sphere1.position.y - detectCir5.position.y) * (sphere1.position.y - detectCir5.position.y) +
+	(sphere1.position.z - detectCir5.position.z) * (sphere1.position.z - detectCir5.position.z)
+    );
+
+    var fSumOfRadius5 = 0.5 + 1;
+    var bCollideBallsNtorus5 = fDistanceBetweenBallnTarget5 < fSumOfRadius5;
+
+    if (bCollideBallsNtorus5)
+    {
+        torus05.material.color.setHex(0xFFB202); 
+    }
+
+  //-6-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget6 = Math.sqrt(  
+	(sphere1.position.x - detectCir6.position.x) * (sphere1.position.x - detectCir6.position.x) +
+	(sphere1.position.y - detectCir6.position.y) * (sphere1.position.y - detectCir6.position.y) +
+	(sphere1.position.z - detectCir6.position.z) * (sphere1.position.z - detectCir6.position.z)
+    );
+
+    var fSumOfRadius6 = 0.5 + 1;
+    var bCollideBallsNtorus6 = fDistanceBetweenBallnTarget6 < fSumOfRadius6;
+
+    if (bCollideBallsNtorus6)
+    {
+        torus06.material.color.setHex(0xFFD575);
+    }
+
+  //-7-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget7 = Math.sqrt(  
+	(sphere1.position.x - detectCir7.position.x) * (sphere1.position.x - detectCir7.position.x) +
+	(sphere1.position.y - detectCir7.position.y) * (sphere1.position.y - detectCir7.position.y) +
+	(sphere1.position.z - detectCir7.position.z) * (sphere1.position.z - detectCir7.position.z)
+    );
+
+    var fSumOfRadius7 = 0.5 + 1;
+    var bCollideBallsNtorus7 = fDistanceBetweenBallnTarget7 < fSumOfRadius7;
+
+
+
+    if (bCollideBallsNtorus7)
+    {
+        torus07.material.color.setHex(0xB875FF);
+    }
+
+ //-8-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget8 = Math.sqrt(  
+	(sphere1.position.x - detectCir8.position.x) * (sphere1.position.x - detectCir8.position.x) +
+	(sphere1.position.y - detectCir8.position.y) * (sphere1.position.y - detectCir8.position.y) +
+	(sphere1.position.z - detectCir8.position.z) * (sphere1.position.z - detectCir8.position.z)
+    );
+
+    var fSumOfRadius8 = 0.5 + 1;
+    var bCollideBallsNtorus8 = fDistanceBetweenBallnTarget8 < fSumOfRadius8;
+
+
+
+    if (bCollideBallsNtorus8)
+    {
+        torus08.material.color.setHex(0xFEA9D4);
+    }
+
+ //-9-
+	// Collision between sphere and torus target 
+	var fDistanceBetweenBallnTarget9 = Math.sqrt(  
+	(sphere1.position.x - detectCir9.position.x) * (sphere1.position.x - detectCir9.position.x) +
+	(sphere1.position.y - detectCir9.position.y) * (sphere1.position.y - detectCir9.position.y) +
+	(sphere1.position.z - detectCir9.position.z) * (sphere1.position.z - detectCir9.position.z)
+    );
+
+    var fSumOfRadius9 = 0.5 + 1;
+    var bCollideBallsNtorus9 = fDistanceBetweenBallnTarget9 < fSumOfRadius9;
+
+
+
+    if (bCollideBallsNtorus9)
+    {
+        torus09.material.color.setHex(0x89FFA9);
+    }
+
+
     iFrame++
-/*
- // get json
- if (jsonFrm>0) {
- getBodies(jsonMotion[iFrame]);
- iFrame ++;
- iFrame = iFrame % jsonFrm; // keep looping the frames
- }
-*/
+
    	renderer.render(scene, camera);
 }
 animate();
@@ -673,10 +829,10 @@ var meshRH = new THREE.Mesh(gRH, mRH);
 scene.add(meshRH);
 
 // Add a ball for the right foot
-//var gRF= new THREE.SphereGeometry(0.1, 18, 18);
-//var mRF = new THREE.MeshPhongMaterial( { color: 0x00CCCC } ); 
-//var meshRF = new THREE.Mesh(gRF, mRF);
-//scene.add(meshRF);
+var gRF= new THREE.SphereGeometry(0.1, 18, 18);
+var mRF = new THREE.MeshPhongMaterial( { color: 0x00CCCC } ); 
+var meshRF = new THREE.Mesh(gRF, mRF);
+scene.add(meshRF);
 
 //add a cannon ball for the left foot
 
@@ -771,27 +927,3 @@ function getBodies(skeleton)
 
 }
 
-/*
-var jsonFrm = 0;
-var jsonMotion = null;
-
-// reading json file
-readTextFile("motion.json", function(text){
- jsonMotion = JSON.parse(text);
- var count = Object.keys(jsonMotion).length;
- console.log(count);
- jsonFrm = count;
- iFrame = 0;
-});
-function readTextFile(file, callback) {
- var rawFile = new XMLHttpRequest();
- rawFile.overrideMimeType("application/json");
- rawFile.open("GET", file, true);
- rawFile.onreadystatechange = function() {
- if (rawFile.readyState === 4) {//} && rawFile.status == "200") {
- callback(rawFile.responseText);
- }
- }
- rawFile.send(null);
-}
-*/
