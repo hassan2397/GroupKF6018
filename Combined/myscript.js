@@ -112,13 +112,15 @@ scene.add(boardRotatorCube2);
 boardRotatorCube2.rotation.z = Math.PI;
 boardRotatorCube2.position.x = 42.5;
 
+var boardTexture = new THREE.TextureLoader().load('textures/Olympic.png');
 var gBoardSign = new THREE.PlaneGeometry(80,30,50);
-var mBoardSign = new THREE.MeshStandardMaterial ({color:0x111111, metalness:0.1, side: THREE.DoubleSide});
+var mBoardSign = new THREE.MeshStandardMaterial ({color:0xffffff, map: boardTexture, metalness:0.1, side: THREE.DoubleSide});
 var boardSign = new THREE.Mesh(gBoardSign, mBoardSign);
 scene.add(boardSign);
 boardSign.position.x = 0;
 boardSign.position.y = 50;
 boardSign.position.z = -90;
+
 
 boardRotatorCube.parent = boardSign;
 boardRotatorCube2.parent = boardSign;
@@ -1237,8 +1239,18 @@ groundBody.position.y = -1.5;
 world.add(groundBody);
 
 // add a ground plane to the scene
+var groundTexture = new THREE.TextureLoader().load('textures/GrassGreenTexture0004.jpg');
+var groundTextureNormal = new THREE.TextureLoader().load('textures/GrassGreenNormal0004.png');
+groundTexture.wrapS = THREE.RepeatWrapping;
+groundTexture.wrapT = THREE.RepeatWrapping;
+groundTexture.repeat.x = 100;
+groundTexture.repeat.y = 100;
+groundTextureNormal.wrapS = THREE.RepeatWrapping;
+groundTextureNormal.wrapT = THREE.RepeatWrapping;
+groundTextureNormal.repeat.x = 100;
+groundTextureNormal.repeat.y = 100;
 var geometry = new THREE.PlaneGeometry(400,400,1,1);   // xy plane
-var gMaterial = new THREE.MeshBasicMaterial( {color: 0x12BD0A, side: THREE.DoubleSide} );
+var gMaterial = new THREE.MeshBasicMaterial( {color: 0x12BD0A, map:groundTexture, side: THREE.DoubleSide} );
 var plane = new THREE.Mesh( geometry, gMaterial );
 plane.position.set(0, -1.5, 0);
 plane.rotation.set(Math.PI/2, 0, 0);
@@ -1611,12 +1623,28 @@ var audioLoader = new THREE.AudioLoader();
 		sound.setVolume(0.1);
 	});
 	
+	
+// create a global audio source
+var sound2 = new THREE.Audio( listener );
+
+// load a sound and set it as the Audio object's buffer
+var audioLoader2 = new THREE.AudioLoader();
+
+	//play a sound if the gun fires
+	audioLoader2.load( 'sounds/plucky.ogg', function( buffer ) {
+		sound2.setBuffer( buffer );
+		sound2.setVolume(0.75);
+		sound2.playbackRate = 4;
+	});
+	
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////ANIMATION////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var armsSpread = false;
 
 //frame count
 var iFrame = 0;
@@ -1753,6 +1781,8 @@ else
 		bCollideTarget4 = fDistanceBetweenTarget7 < fSumOfRadiusTarget;
 		bCollideTarget4 = fDistanceBetweenTarget8 < fSumOfRadiusTarget;
 		
+		
+		
 		//If collision between the bottom target and ball is true
 		if (bCollideTarget)
 		{  
@@ -1762,6 +1792,7 @@ else
 			targetTorso.material.color.setHex(0xFF0000);
 			//increment score
 			shootingScore +=1;
+			sound2.play();
 		}
 		else if(targetTorso.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided1 > 100)
 		{
@@ -1776,6 +1807,7 @@ else
 			targetTorso2.material.color.setHex(0xFF0000);
 			//increment score
 			shootingScore +=1;
+			sound2.play();
 		}
 		else if(targetTorso2.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided2 > 100)
 		{
@@ -1789,6 +1821,7 @@ else
 			targetTorso3.material.color.setHex(0xFF0000);
 			//increment score
 			shootingScore +=1;
+			sound2.play();
 		}
 		else if(targetTorso3.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided3 > 100)
 		{
@@ -1802,6 +1835,7 @@ else
 			targetTorso4.material.color.setHex(0xFF0000);
 			//increment score
 			shootingScore +=1;
+			sound2.play();
 		}
 		else if(targetTorso4.material.color.getHexString() == "ff0000" && iFrame - lastTimeCollided4 > 100)
 		{
@@ -1826,8 +1860,17 @@ else
 			bulletsLH[i].geometry.dispose();
 		}
 	}
-	//add the updated score to the page
-	document.getElementById("score").innerText = "Score: " + shootingScore;
+	if(shootingScore>0)
+	{
+		//add the updated score to the page
+		document.getElementById("score").innerText = "Score: " + shootingScore;
+	}
+	
+	//change colour of back wall if score threshold is reached
+	if(shootingScore > 500 && iFrame < 5000)
+		backWall.material.color.setHex(0x009900);
+	else
+		backWall.material.color.setHex(0x003300);
 
 	//render the bullets and move them along local z axis
 	delta = clock.getDelta();
@@ -1840,7 +1883,6 @@ else
 	}
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////HOLES RING GAME ANIMATIONS////////////////////////////////////////////
@@ -1999,7 +2041,6 @@ cube.rotation.y += 0.006;
     var bCollideBallsNtorus8 = fDistanceBetweenBallnTarget8 < fSumOfRadius8;
 
 
-
     if (bCollideBallsNtorus8)
     {
         torus08.material.color.setHex(0xFEA9D4);
@@ -2021,8 +2062,38 @@ cube.rotation.y += 0.006;
         torus09.material.color.setHex(0x89FFA9);
     }
 
+	
+	if(armsSpread)
+	{
+		for(var i = 0; i<shoulder1Array.length; i++)
+		{
+			joint1Array[i].rotation.x += 0.1;
+			joint2Array[i].rotation.x += 0.1;
+			joint1Array2[i].rotation.x+=0.1;
+			joint2Array2[i].rotation.x+=0.1;
+			joint1Array3[i].rotation.x+=0.1;
+			joint2Array3[i].rotation.x+=0.1;
+			joint1Array4[i].rotation.x+=0.1;
+			joint2Array4[i].rotation.x+=0.1;
+			console.log(joint1Array[i].rotation.x);
+		}
+	}
+	else
+	{
+		for(var i = 0; i<shoulder1Array.length; i++)
+		{
+		joint1Array[i].rotation.x = 0;
+		joint2Array[i].rotation.x = 0;
+		joint1Array2[i].rotation.x=0;
+		joint2Array2[i].rotation.x=0;
+		joint1Array3[i].rotation.x=0;
+		joint2Array3[i].rotation.x=0;
+		joint1Array4[i].rotation.x=0;
+		joint2Array4[i].rotation.x=0;
+		}
+	}
+	
 /*
-
 // get json
  if (jsonFrm>0) {
  getBodies(jsonMotion[iFrame]);
@@ -2140,9 +2211,9 @@ function getBodies(skeleton)
 	meshLH.position.y = skeleton.joints[kinectron.HANDLEFT].cameraY;
 	meshLH.position.z = skeleton.joints[kinectron.HANDLEFT].cameraZ;
 	
-	meshRH.position.x = skeleton.joints[kinectron.WRISTRIGHT].cameraX;
-	meshRH.position.y = skeleton.joints[kinectron.WRISTRIGHT].cameraY;	
-	meshRH.position.z = skeleton.joints[kinectron.WRISTRIGHT].cameraZ;
+	meshRH.position.x = skeleton.joints[kinectron.HANDRIGHT].cameraX;
+	meshRH.position.y = skeleton.joints[kinectron.HANDRIGHT].cameraY;	
+	meshRH.position.z = skeleton.joints[kinectron.HANDRIGHT].cameraZ;
 	
 	meshHead.position.x = skeleton.joints[kinectron.HEAD].cameraX;
 	meshHead.position.y = skeleton.joints[kinectron.HEAD].cameraY;
@@ -2285,7 +2356,7 @@ function getBodies(skeleton)
 	Math.pow((skeleton.joints[kinectron.HANDRIGHT].cameraY - skeleton.joints[kinectron.HIPRIGHT].cameraY),2));
 	
 	//sum of radius between the right foot and left foot;
-	var fSumOfRadiusRFLF = 0.1;
+	var fSumOfRadiusRFLF = 0.25;
 	
 	var armsAway = false;
 	if(fDistanceLeftArmWithHipLeft > 0.6 && fDistanceRightArmWithHipRight > 0.6)
@@ -2301,6 +2372,18 @@ function getBodies(skeleton)
 	else
 		fire = false;
 	
+	
+	var fHandDistance = Math.sqrt(
+	(meshLH.position.x-meshRH.position.x)*(meshLH.position.x-meshRH.position.x) + 
+	(meshLH.position.y-meshRH.position.y)*(meshLH.position.y-meshRH.position.y) + 
+	(meshLH.position.z-meshRH.position.z)*(meshLH.position.z-meshRH.position.z)
+	);
+	if (fHandDistance>1.4) // Arm spreading
+	{
+	     armsSpread=true;
+	}
+	else
+	     armsSpread=false;
 
 }
 
