@@ -5,7 +5,7 @@ var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.x = 0;
 camera.position.z = 120;
-camera.position.y = 100;
+camera.position.y = 30;
 camera.lookAt(0,0,0);
 
 // Render
@@ -28,11 +28,23 @@ controls.update();
 var lightAmbient = new THREE.AmbientLight( 0x888888 ); 
 //scene.add(lightAmbient);
 
-// Point light
+// Point lights
 var lightThis = new THREE.PointLight(0xffffff);
-lightThis.position.set(3, 20, 3);
+lightThis.position.set(3, 50, 3);
 lightThis.intensity = 1.5;
 scene.add(lightThis);
+
+// Point lights
+var lightThis2 = new THREE.PointLight(0xffffff);
+lightThis2.position.set(-100, 50, 3);
+lightThis2.intensity = 1.5;
+scene.add(lightThis2);
+
+// Point lights
+var lightThis3 = new THREE.PointLight(0xffffff);
+lightThis3.position.set(100, 50, 3);
+lightThis3.intensity = 1.5;
+scene.add(lightThis3);
 
 // light visualizer 
 var lGeoPoint = new THREE.SphereGeometry(0.5,10,10);
@@ -49,34 +61,87 @@ lMeshPoint.parent = lightThis;
 
 // backWall
 var gBackWall = new THREE.PlaneGeometry(60, 30);
-var mBackWall = new THREE.MeshStandardMaterial( {color: 0xBB3300, side: THREE.DoubleSide, transparent: true, opacity: 0.5, metalness: 1.0, roughness: 0.8} );
+var mBackWall = new THREE.MeshStandardMaterial( {color: 0x003300, side: THREE.DoubleSide, transparent: true, opacity: 0.9, metalness: 1.0, roughness: 0.8} );
 var backWall = new THREE.Mesh(gBackWall, mBackWall);
 backWall.position.z = -40.0;
 backWall.position.y = 15;
-backWall.position.x = 50;
+backWall.position.x = 0;
 scene.add(backWall);
 
-/*
-// sideWall Left
-var gSideWallL = new THREE.PlaneGeometry(80, 30);
-var mSideWallL = new THREE.MeshPhongMaterial( {color: 0xBB3300, side: THREE.DoubleSide} );
-var sideWallL = new THREE.Mesh(gSideWallL, mSideWallL);
-sideWallL.position.z = 0;
-sideWallL.position.y = 10;
-sideWallL.position.x = -25;
-sideWallL.rotation.y = (3.14/2);
-scene.add(sideWallL);
+//Stadium made from lathe
+var points = [];
+for ( var i = 0; i < 20; i ++ ) {
+	points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 30 + 185, ( i - 5 ) * 6 ) );
+}
+for ( var i = 0; i < 20; i ++ ) {
+	points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 30 + 185, ( i - 5 ) * 6 ) );
+}
+var gLathe = new THREE.LatheGeometry( points );
+var mLathe = new THREE.MeshStandardMaterial( { color: 0x222222, side: THREE.DoubleSide, metalness: 0.75 } );
+var lathe = new THREE.Mesh( gLathe, mLathe);
+scene.add( lathe );
 
-// sideWall Right
-var gSideWallR = new THREE.PlaneGeometry(80, 30);
-var mSideWallR = new THREE.MeshPhongMaterial( {color: 0xBB3300, side: THREE.DoubleSide} );
-var sideWallR = new THREE.Mesh(gSideWallR, mSideWallR);
-sideWallR.position.z = 0;
-sideWallR.position.y = 10;
-sideWallR.position.x = 25;
-sideWallR.rotation.y = (3.14/2);
-scene.add(sideWallR);
-*/
+//spinning billboard
+var gBoardPost = new THREE.CylinderGeometry(1,1,65);
+var mBoardPost = new THREE.MeshStandardMaterial ({color:0x00ff00, metalness:0.75});
+var boardPost1 = new THREE.Mesh(gBoardPost, mBoardPost);
+boardPost1.position.x = -45;
+boardPost1.position.y = 30;
+boardPost1.position.z = -90;
+scene.add(boardPost1);
+
+var gBoardPost2 = new THREE.CylinderGeometry(1,1,65);
+var mBoardPost2 = new THREE.MeshStandardMaterial ({color:0x00ff00, metalness:0.75});
+var boardPost2 = new THREE.Mesh(gBoardPost2, mBoardPost2);
+boardPost2.position.x = 45;
+boardPost2.position.y = 30;
+boardPost2.position.z = -90;
+scene.add(boardPost2);
+
+var gBoardRotatorCube = new THREE.DodecahedronGeometry(3.0);
+var mBoardRotatorCube = new THREE.MeshStandardMaterial({color:0xbb0000, metalness:0.8});
+var boardRotatorCube = new THREE.Mesh(gBoardRotatorCube, mBoardRotatorCube);
+scene.add(boardRotatorCube);
+boardRotatorCube.rotation.z = Math.PI;
+boardRotatorCube.position.x = -42.5;
+
+var gBoardRotatorCube2 = new THREE.DodecahedronGeometry(3.0);
+var mBoardRotatorCube2 = new THREE.MeshStandardMaterial({color:0xbb0000, metalness:0.8});
+var boardRotatorCube2 = new THREE.Mesh(gBoardRotatorCube2, mBoardRotatorCube2);
+scene.add(boardRotatorCube2);
+boardRotatorCube2.rotation.z = Math.PI;
+boardRotatorCube2.position.x = 42.5;
+
+var gBoardSign = new THREE.PlaneGeometry(80,30,50);
+var mBoardSign = new THREE.MeshStandardMaterial ({color:0x111111, metalness:0.1, side: THREE.DoubleSide});
+var boardSign = new THREE.Mesh(gBoardSign, mBoardSign);
+scene.add(boardSign);
+boardSign.position.x = 0;
+boardSign.position.y = 50;
+boardSign.position.z = -90;
+
+boardRotatorCube.parent = boardSign;
+boardRotatorCube2.parent = boardSign;
+
+//Skybox
+
+ var imagePrefix = "images/";
+ var directions  = ["px", "nx", "py", "ny", "pz", "nz"];
+ var imageSuffix = ".png";
+   
+ var materialArray = [];
+ for (var i = 0; i < 6; i++)
+  materialArray.push( new THREE.MeshBasicMaterial({
+   map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+   side: THREE.BackSide
+  }));
+  
+ var skyGeometry = new THREE.CubeGeometry( 500, 500, 500 );
+ var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
+ var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+ skyBox.position.y += 55;
+ scene.add( skyBox );
+//
 
 /////////////////////////////////////////Targets//////////////////////////////////////////////////////////
 
@@ -245,6 +310,898 @@ cylinder3.parent = cube;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////CROWD///////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var listener = new THREE.AudioListener();
+camera.add( listener );
+// create a global audio source
+var sound = new THREE.Audio( listener );
+// load a sound and set it as the Audio object's buffer
+var audioLoader = new THREE.AudioLoader();
+audioLoader.load( 'CrowdEffect.ogg', function( buffer ) {
+	sound.setBuffer( buffer );
+	sound.setLoop( true );
+	sound.setVolume( 0.5 );
+
+});
+sound.play();
+
+var geostairs1 = new THREE.BoxGeometry( 7, 10, 80 );
+var matstairs1 = new THREE.MeshBasicMaterial( {color: 0x7E5353} );
+var stairs1 = new THREE.Mesh( geostairs1, matstairs1 );
+scene.add( stairs1 );
+stairs1.position.x = -80;
+stairs1.position.z=0;
+
+
+var geostairs2 = new THREE.BoxGeometry( 7, 20, 80 );
+var matstairs2 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+var stairs2 = new THREE.Mesh( geostairs2, matstairs2 );
+scene.add( stairs2 );
+stairs2.position.x = -7;
+
+var geostairs3 = new THREE.BoxGeometry( 7, 30, 80 );
+var matstairs3 = new THREE.MeshBasicMaterial( {color: 0x7E5353} );
+var stairs3 = new THREE.Mesh( geostairs3, matstairs3 );
+scene.add( stairs3 );
+stairs3.position.x = -7;
+
+var geostairs4 = new THREE.BoxGeometry( 7, 40, 80 );
+var matstairs4 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+var stairs4 = new THREE.Mesh( geostairs4, matstairs4 );
+scene.add( stairs4 );
+stairs4.position.x=-7;
+
+stairs2.parent=stairs1;
+stairs3.parent=stairs2;
+stairs4.parent=stairs3;
+
+var geostairs5 = new THREE.BoxGeometry( 7, 10, 80 );
+var matstairs5 = new THREE.MeshBasicMaterial( {color: 0x7E5353} );
+var stairs5 = new THREE.Mesh( geostairs5, matstairs5 );
+scene.add( stairs5 );
+stairs5.position.x = 85;
+stairs5.position.z=0;
+
+
+var geostairs6 = new THREE.BoxGeometry( 7, 20, 80 );
+var matstairs6 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+var stairs6 = new THREE.Mesh( geostairs6, matstairs6 );
+scene.add( stairs6 );
+stairs6.position.x = 7;
+
+var geostairs7 = new THREE.BoxGeometry(7, 30, 80 );
+var matstairs7 = new THREE.MeshBasicMaterial( {color: 0x7E5353} );
+var stairs7 = new THREE.Mesh( geostairs7, matstairs7 );
+scene.add( stairs7 );
+stairs7.position.x = 7;
+
+var geostairs8 = new THREE.BoxGeometry( 7, 40, 80 );
+var matstairs8 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+var stairs8 = new THREE.Mesh( geostairs8, matstairs8 );
+scene.add( stairs8 );
+stairs8.position.x=7;
+
+stairs6.parent=stairs5;
+stairs7.parent=stairs6;
+stairs8.parent=stairs7;
+
+
+// An array of particles
+var iNumber = 17;
+
+var geoArray = [];
+var matArray = [];
+var headArray = [];
+
+
+
+var geoArray2 = [];
+var matArray2 = [];
+var hat1Array = [];
+
+
+var geoArray3 = [];
+var matArray3 = [];
+var hat2Array = [];
+
+var geoArray4 = [];
+var matArray4 = [];
+var glass1Array = [];
+
+var geoArray5 = [];
+var matArray5 = [];
+var glass2Array = [];
+
+var geoArray6 = [];
+var matArray6 = [];
+var eye1Array = [];
+
+var geoArray7 = [];
+var matArray7 = [];
+var eye2Array = [];
+
+var geoArray8 = [];
+var matArray8 = [];
+var eyelineArray = [];
+
+var geoArray9 = [];
+var matArray9 = [];
+var bodyArray = [];
+
+var geoArray10 = [];
+var matArray10 = [];
+var bodylineArray = [];
+
+var geoArray11 = [];
+var matArray11 = [];
+var bodydownArray = [];
+
+var geoArray12 = [];
+var matArray12 = [];
+var leg1Array = [];
+
+var geoArray13 = [];
+var matArray13 = [];
+var leg2Array = [];
+
+var geoArray14 = [];
+var matArray14 = [];
+var shoesArray = [];
+
+var geoArray15 = [];
+var matArray15 = [];
+var hand1Array = [];
+
+var geoArray16 = [];
+var matArray16 = [];
+var hand2Array = [];
+
+var geoArray17 = [];
+var matArray17 = [];
+var palm1Array = [];
+
+var geoArray18 = [];
+var matArray18 = [];
+var palm2Array = [];
+
+var geoArray19 = [];
+var matArray19 = [];
+var beardArray = [];
+
+var geoArray20 = [];
+var matArray20 = [];
+var mouthArray = [];
+
+var geoArray21 = [];
+var matArray21 = [];
+var mouth2Array = [];
+
+var geoArray22=[];
+var matArray22=[];
+var shoulder1Array=[];
+
+var geoArray23=[];
+var matArray23=[];
+var shoulder2Array=[];
+
+var geoArray24=[];
+var matArray24=[];
+var joint1Array=[];
+
+var geoArray25=[];
+var matArray25=[];
+var joint2Array=[];
+
+
+
+// Create the particles
+for (var i=0; i<iNumber; i++)
+{
+	
+	geoArray.push(new THREE.BoxGeometry(1.7, 1.7, 1.7));
+    matArray.push(new THREE.MeshPhongMaterial({color:0xe0bea5}))
+    headArray.push(new THREE.Mesh(geoArray[i], matArray) );	
+
+	geoArray2.push(new THREE.BoxGeometry(2.5, 0.2, 2.5));
+    matArray2.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    hat1Array.push(new THREE.Mesh(geoArray2[i],matArray2));
+
+
+	geoArray3.push(new THREE.BoxGeometry(1, 1, 1));
+    matArray3.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    hat2Array.push(new THREE.Mesh(geoArray3[i],matArray3));
+
+
+	geoArray4.push(new THREE.BoxGeometry(0.7, 0.4, 0.1));
+    matArray4.push(new THREE.MeshPhongMaterial({color:0xFFFFFF}))
+    glass1Array.push(new THREE.Mesh(geoArray4[i],matArray4));
+
+
+	geoArray5.push(new THREE.BoxGeometry(0.7, 0.4, 0.1));
+    matArray5.push(new THREE.MeshPhongMaterial({color:0xFFFFFF}))
+    glass2Array.push(new THREE.Mesh(geoArray5[i],matArray4)); //matarray4
+
+
+	geoArray6.push(new THREE.BoxGeometry(0.2, 0.2, 0.01));
+    matArray6.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    eye1Array.push(new THREE.Mesh(geoArray6[i],matArray6)); 
+
+	geoArray7.push(new THREE.BoxGeometry(0.2, 0.2, 0.01));
+    matArray7.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    eye2Array.push(new THREE.Mesh(geoArray7[i],matArray7)); 
+
+	geoArray8.push(new THREE.BoxGeometry(0.5, 0.07, 0.01));
+    matArray8.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    eyelineArray.push(new THREE.Mesh(geoArray8[i],matArray8)); 
+
+	geoArray9.push(new THREE.BoxGeometry(2.5, 2.2, 2));
+    matArray9.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    bodyArray.push(new THREE.Mesh(geoArray9[i],matArray9)); 
+
+	geoArray10.push(new THREE.BoxGeometry(0.5, 1.5, 0.2));
+    matArray10.push(new THREE.MeshPhongMaterial({color:0xFFFFFF}))
+    bodylineArray.push(new THREE.Mesh(geoArray10[i],matArray10)); 
+
+	geoArray11.push(new THREE.BoxGeometry(1.2, 0.5, 1.5));
+    matArray11.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    bodydownArray.push(new THREE.Mesh(geoArray11[i],matArray11)); 
+
+	geoArray12.push(new THREE.BoxGeometry(0.5, 1.5, 0.5));
+    matArray12.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    leg1Array.push(new THREE.Mesh(geoArray12[i],matArray12));
+
+	geoArray13.push(new THREE.BoxGeometry(0.5, 1.5, 0.5));
+    matArray13.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    leg2Array.push(new THREE.Mesh(geoArray12[i],matArray13));
+
+	geoArray14.push(new THREE.BoxGeometry(1.2, 0.5, 1.5));
+    matArray14.push(new THREE.MeshPhongMaterial({color:0x585858}))
+    shoesArray.push(new THREE.Mesh(geoArray14[i],matArray14));
+
+	geoArray15.push(new THREE.BoxGeometry(0.3, 2.3, 0.5));
+    matArray15.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    hand1Array.push(new THREE.Mesh(geoArray15[i],matArray15));
+
+	geoArray16.push(new THREE.BoxGeometry(0.3, 2.3, 0.5));
+    matArray16.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    hand2Array.push(new THREE.Mesh(geoArray16[i],matArray16));
+
+	geoArray17.push(new THREE.BoxGeometry(0.5, 0.5, 0.5));
+    matArray17.push(new THREE.MeshPhongMaterial({color:0xe0bea5}))
+    palm1Array.push(new THREE.Mesh(geoArray17[i],matArray17));
+
+	geoArray18.push(new THREE.BoxGeometry(0.5, 0.5, 0.5));
+    matArray18.push(new THREE.MeshPhongMaterial({color:0xe0bea5}))
+    palm2Array.push(new THREE.Mesh(geoArray18[i],matArray18));
+
+	geoArray19.push(new THREE.BoxGeometry(0.9, 0.7, 0.1));
+    matArray19.push(new THREE.MeshPhongMaterial({color:0xbb7344}))
+    beardArray.push(new THREE.Mesh(geoArray19[i],matArray19));
+
+	geoArray20.push(new THREE.BoxGeometry(0.5, 0.3, 0.1));
+    matArray20.push(new THREE.MeshPhongMaterial({color:0xe0bea5}))
+    mouthArray.push(new THREE.Mesh(geoArray20[i],matArray20));
+
+	geoArray21.push(new THREE.BoxGeometry(0.3, 0.1, 0.1));
+    matArray21.push(new THREE.MeshPhongMaterial({color:0x000000}))
+    mouth2Array.push(new THREE.Mesh(geoArray21[i],matArray21));
+
+	geoArray22.push(new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32))
+	matArray22.push(new THREE.MeshPhongMaterial({color:0x585858}))
+	shoulder1Array.push(new THREE.Mesh(geoArray22[i],matArray22));
+
+	geoArray23.push(new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32))
+	matArray23.push(new THREE.MeshPhongMaterial({color:0x585858}))
+	shoulder2Array.push(new THREE.Mesh(geoArray23[i],matArray23));
+
+	geoArray24.push(new THREE.SphereGeometry(0.2, 0.2, 32))
+	matArray24.push(new THREE.MeshPhongMaterial({color:0x585858}))
+	joint1Array.push(new THREE.Mesh(geoArray24[i],matArray24));
+
+	geoArray25.push(new THREE.SphereGeometry(0.2, 0.2, 32))
+	matArray25.push(new THREE.MeshPhongMaterial({color:0x585858}))
+	joint2Array.push(new THREE.Mesh(geoArray25[i],matArray25));
+
+ 	headArray[i].position.x = 83;
+    headArray[i].position.y = 10.5;
+    headArray[i].position.z =(4*i)-30;
+    //headArray[i].position.z =-5;
+
+
+	hat1Array[i].position.y = 0.9;
+    hat2Array[i].position.y = 1;
+    glass1Array[i].position.x=-0.5
+    glass1Array[i].position.y=0.2;
+    glass1Array[i].position.z=0.9;
+	glass2Array[i].position.x=0.5
+    glass2Array[i].position.y=0.2;
+    glass2Array[i].position.z=0.9;
+  	eye1Array[i].position.z=0.1;
+  	eye2Array[i].position.z=0.1;
+  	eyelineArray[i].position.y=0.15;
+  	eyelineArray[i].position.z=0.9;
+  	bodyArray[i].position.y=-1.9;
+  	bodyArray[i].position.z=-0.2;
+  	bodylineArray[i].position.z=1;
+  	bodydownArray[i].position.y=-1.3;
+  	leg1Array[i].position.x=-0.35;
+  	leg1Array[i].position.y=-1;
+  	leg2Array[i].position.x=0.35;
+  	leg2Array[i].position.y=-1;
+  	shoesArray[i].position.x=0.3;
+  	shoesArray[i].position.y=-1;
+  	shoesArray[i].position.z=0.5;
+  	hand1Array[i].position.x=-0.25;
+  	hand1Array[i].position.y=-0.8;
+	hand2Array[i].position.x=0.25;
+  	hand2Array[i].position.y=-0.8;
+  	palm1Array[i].position.y=-1.4;
+  	palm2Array[i].position.y=-1.4;
+  	beardArray[i].position.y=-0.6;
+	beardArray[i].position.z=0.9;
+	mouthArray[i].position.y=-0.6;
+	mouthArray[i].position.z=1;
+	mouth2Array[i].position.z=0.1;
+	shoulder1Array[i].position.y=0.8;
+	shoulder1Array[i].position.x=-1.4;
+	shoulder2Array[i].position.y=0.8;
+	shoulder2Array[i].position.x=1.4;
+	joint1Array[i].position.x=-1.4;
+	joint1Array[i].position.y=0.8;
+	joint2Array[i].position.x=1.4;
+	joint2Array[i].position.y=0.8;
+
+    scene.add(headArray[i]);
+    scene.add(hat1Array[i]);
+    scene.add(hat2Array[i]);
+    scene.add(glass1Array[i]);
+    scene.add(glass2Array[i]);
+    scene.add(eye1Array[i]);
+    scene.add(eye2Array[i]);
+    scene.add(eyelineArray[i]);
+    scene.add(bodyArray[i]);
+    scene.add(bodylineArray[i]);
+    scene.add(bodydownArray[i]);
+    scene.add(leg1Array[i]);
+    scene.add(leg2Array[i]);
+	scene.add(shoesArray[i]);
+	scene.add(hand1Array[i]);
+	scene.add(hand2Array[i]);
+	scene.add(palm1Array[i]);
+	scene.add(palm2Array[i]);
+	scene.add(beardArray[i]);
+	scene.add(mouthArray[i]);
+	scene.add(mouth2Array[i]);
+	scene.add(shoulder1Array[i]);
+	scene.add(shoulder2Array[i]);
+	scene.add(joint1Array[i]);
+	scene.add(joint2Array[i]);
+	
+    hat1Array[i].parent=headArray[i];
+    hat2Array[i].parent=headArray[i];
+	glass1Array[i].parent=headArray[i];
+	glass2Array[i].parent=headArray[i];
+	eye1Array[i].parent=glass1Array[i];
+	eye2Array[i].parent=glass2Array[i];
+	eyelineArray[i].parent=headArray[i];
+	bodyArray[i].parent=headArray[i];
+	bodylineArray[i].parent=bodyArray[i];
+	bodydownArray[i].parent=bodyArray[i];
+	leg1Array[i].parent=bodydownArray[i];
+	leg2Array[i].parent=bodydownArray[i];
+	shoesArray[i].parent=leg1Array[i];
+	hand1Array[i].parent=joint1Array[i];
+	hand2Array[i].parent=joint2Array[i];
+	palm1Array[i].parent=hand1Array[i];
+	palm2Array[i].parent=hand2Array[i];
+	beardArray[i].parent=headArray[i];
+	mouthArray[i].parent=headArray[i];
+	mouth2Array[i].parent=mouthArray[i];
+	shoulder1Array[i].parent=bodyArray[i];
+	shoulder2Array[i].parent=bodyArray[i];
+	joint1Array[i].parent=bodyArray[i];
+	joint2Array[i].parent=bodyArray[i];
+
+headArray[i].rotation.y =4.8;
+shoulder1Array[i].rotation.z=Math.PI/2;
+shoulder2Array[i].rotation.z=Math.PI/2;
+
+
+}
+
+
+var headArray2 = [];
+var hat1Array2 = [];
+var hat2Array2 = [];
+var glass1Array2 = [];
+var glass2Array2 = [];
+var eye1Array2 = [];
+var eye2Array2 = [];
+var eyelineArray2 = [];
+var bodyArray2 = [];
+var bodylineArray2 = [];
+var bodydownArray2 = [];
+var leg1Array2 = [];
+var leg2Array2 = [];
+var shoesArray2 = [];
+var hand1Array2 = [];
+var hand2Array2 = [];
+var palm1Array2 = [];
+var palm2Array2 = [];
+var beardArray2 = [];
+var mouthArray2 = [];
+var mouth2Array2 = [];
+var shoulder1Array2=[];
+var shoulder2Array2=[];
+var joint1Array2=[];
+var joint2Array2=[];
+
+// Create the particles
+for (var i=0; i<iNumber; i++)
+{
+	
+
+    headArray2.push(new THREE.Mesh(geoArray[i], matArray) );	
+    hat1Array2.push(new THREE.Mesh(geoArray2[i],matArray2));
+    hat2Array2.push(new THREE.Mesh(geoArray3[i],matArray3));
+    glass1Array2.push(new THREE.Mesh(geoArray4[i],matArray4));
+    glass2Array2.push(new THREE.Mesh(geoArray5[i],matArray4)); 
+    eye1Array2.push(new THREE.Mesh(geoArray6[i],matArray6)); 
+    eye2Array2.push(new THREE.Mesh(geoArray7[i],matArray7)); 
+    eyelineArray2.push(new THREE.Mesh(geoArray8[i],matArray8)); 
+    bodyArray2.push(new THREE.Mesh(geoArray9[i],matArray9)); 
+    bodylineArray2.push(new THREE.Mesh(geoArray10[i],matArray10)); 
+    bodydownArray2.push(new THREE.Mesh(geoArray11[i],matArray11)); 
+    leg1Array2.push(new THREE.Mesh(geoArray12[i],matArray12));
+    leg2Array2.push(new THREE.Mesh(geoArray12[i],matArray13));
+    shoesArray2.push(new THREE.Mesh(geoArray14[i],matArray14));
+    hand1Array2.push(new THREE.Mesh(geoArray15[i],matArray15));
+    hand2Array2.push(new THREE.Mesh(geoArray16[i],matArray16));	
+    palm1Array2.push(new THREE.Mesh(geoArray17[i],matArray17));
+    palm2Array2.push(new THREE.Mesh(geoArray18[i],matArray18));
+    beardArray2.push(new THREE.Mesh(geoArray19[i],matArray19));
+    mouthArray2.push(new THREE.Mesh(geoArray20[i],matArray20));
+    mouth2Array2.push(new THREE.Mesh(geoArray21[i],matArray21));
+	shoulder1Array2.push(new THREE.Mesh(geoArray22[i],matArray22));
+	shoulder2Array2.push(new THREE.Mesh(geoArray23[i],matArray23));
+	joint1Array2.push(new THREE.Mesh(geoArray24[i],matArray24));
+	joint2Array2.push(new THREE.Mesh(geoArray25[i],matArray25));
+
+    headArray2[i].position.y = 15;
+    headArray2[i].position.x = 93;
+    headArray2[i].position.z =(4*i)-30;
+
+	hat1Array2[i].position.y = 0.9;
+    hat2Array2[i].position.y = 1;
+    glass1Array2[i].position.x=-0.5
+    glass1Array2[i].position.y=0.2;
+    glass1Array2[i].position.z=0.9;
+	glass2Array2[i].position.x=0.5
+    glass2Array2[i].position.y=0.2;
+    glass2Array2[i].position.z=0.9;
+  	eye1Array2[i].position.z=0.1;
+  	eye2Array2[i].position.z=0.1;
+  	eyelineArray2[i].position.y=0.15;
+  	eyelineArray2[i].position.z=0.9;
+  	bodyArray2[i].position.y=-1.9;
+  	bodyArray2[i].position.z=-0.2;
+  	bodylineArray2[i].position.z=1;
+  	bodydownArray2[i].position.y=-1.3;
+  	leg1Array2[i].position.x=-0.35;
+  	leg1Array2[i].position.y=-1;
+  	leg2Array2[i].position.x=0.35;
+  	leg2Array2[i].position.y=-1;
+  	shoesArray2[i].position.x=0.3;
+  	shoesArray2[i].position.y=-1;
+  	shoesArray2[i].position.z=0.5;
+  	hand1Array2[i].position.x=-0.25;
+  	hand1Array2[i].position.y=-0.8;
+	hand2Array2[i].position.x=0.25;
+  	hand2Array2[i].position.y=-0.8;
+  	palm1Array2[i].position.y=-1.4;
+  	palm2Array2[i].position.y=-1.4;
+  	beardArray2[i].position.y=-0.6;
+	beardArray2[i].position.z=0.9;
+	mouthArray2[i].position.y=-0.6;
+	mouthArray2[i].position.z=1;
+	mouth2Array2[i].position.z=0.1;
+	shoulder1Array2[i].position.y=0.8;
+	shoulder1Array2[i].position.x=-1.4;
+	shoulder2Array2[i].position.y=0.8;
+	shoulder2Array2[i].position.x=1.4;
+	joint1Array2[i].position.x=-1.4;
+	joint1Array2[i].position.y=0.8;
+	joint2Array2[i].position.x=1.4;
+	joint2Array2[i].position.y=0.8;
+
+    scene.add(headArray2[i]);
+    scene.add(hat1Array2[i]);
+    scene.add(hat2Array2[i]);
+    scene.add(glass1Array2[i]);
+    scene.add(glass2Array2[i]);
+    scene.add(eye1Array2[i]);
+    scene.add(eye2Array2[i]);
+    scene.add(eyelineArray2[i]);
+    scene.add(bodyArray2[i]);
+    scene.add(bodylineArray2[i]);
+    scene.add(bodydownArray2[i]);
+    scene.add(leg1Array2[i]);
+    scene.add(leg2Array2[i]);
+	scene.add(shoesArray2[i]);
+	scene.add(hand1Array2[i]);
+	scene.add(hand2Array2[i]);
+	scene.add(palm1Array2[i]);
+	scene.add(palm2Array2[i]);
+	scene.add(beardArray2[i]);
+	scene.add(mouthArray2[i]);
+	scene.add(mouth2Array2[i]);
+	scene.add(shoulder1Array2[i]);
+	scene.add(shoulder2Array2[i]);
+	scene.add(joint1Array2[i]);
+	scene.add(joint2Array2[i]);
+	
+    hat1Array2[i].parent=headArray2[i];
+    hat2Array2[i].parent=headArray2[i];
+	glass1Array2[i].parent=headArray2[i];
+	glass2Array2[i].parent=headArray2[i];
+	eye1Array2[i].parent=glass1Array2[i];
+	eye2Array2[i].parent=glass2Array2[i];
+	eyelineArray2[i].parent=headArray2[i];
+	bodyArray2[i].parent=headArray2[i];
+	bodylineArray2[i].parent=bodyArray2[i];
+	bodydownArray2[i].parent=bodyArray2[i];
+	leg1Array2[i].parent=bodydownArray2[i];
+	leg2Array2[i].parent=bodydownArray2[i];
+	shoesArray2[i].parent=leg1Array2[i];
+	hand1Array2[i].parent=joint1Array2[i];
+	hand2Array2[i].parent=joint2Array2[i];
+	palm1Array2[i].parent=hand1Array2[i];
+	palm2Array2[i].parent=hand2Array2[i];
+	beardArray2[i].parent=headArray2[i];
+	mouthArray2[i].parent=headArray2[i];
+	mouth2Array2[i].parent=mouthArray2[i];
+	shoulder1Array2[i].parent=bodyArray2[i];
+	shoulder2Array2[i].parent=bodyArray2[i];
+	joint1Array2[i].parent=bodyArray2[i];
+	joint2Array2[i].parent=bodyArray2[i];
+
+headArray2[i].rotation.y =4.8;
+shoulder1Array2[i].rotation.z=Math.PI/2;
+shoulder2Array2[i].rotation.z=Math.PI/2;
+
+
+}
+
+
+var headArray3 = [];
+var hat1Array3 = [];
+var hat2Array3 = [];
+var glass1Array3 = [];
+var glass2Array3 = [];
+var eye1Array3 = [];
+var eye2Array3 = [];
+var eyelineArray3 = [];
+var bodyArray3 = [];
+var bodylineArray3 = [];
+var bodydownArray3 = [];
+var leg1Array3 = [];
+var leg2Array3 = [];
+var shoesArray3 = [];
+var hand1Array3 = [];
+var hand2Array3 = [];
+var palm1Array3 = [];
+var palm2Array3 = [];
+var beardArray3 = [];
+var mouthArray3 = [];
+var mouth2Array3 = [];
+var shoulder1Array3=[];
+var shoulder2Array3=[];
+var joint1Array3=[];
+var joint2Array3=[];
+
+// Create the particles
+for (var i=0; i<iNumber; i++)
+{
+	
+
+    headArray3.push(new THREE.Mesh(geoArray[i], matArray) );	
+    hat1Array3.push(new THREE.Mesh(geoArray2[i],matArray2));
+    hat2Array3.push(new THREE.Mesh(geoArray3[i],matArray3));
+    glass1Array3.push(new THREE.Mesh(geoArray4[i],matArray4));
+    glass2Array3.push(new THREE.Mesh(geoArray5[i],matArray4)); 
+    eye1Array3.push(new THREE.Mesh(geoArray6[i],matArray6)); 
+    eye2Array3.push(new THREE.Mesh(geoArray7[i],matArray7)); 
+    eyelineArray3.push(new THREE.Mesh(geoArray8[i],matArray8)); 
+    bodyArray3.push(new THREE.Mesh(geoArray9[i],matArray9)); 
+    bodylineArray3.push(new THREE.Mesh(geoArray10[i],matArray10)); 
+    bodydownArray3.push(new THREE.Mesh(geoArray11[i],matArray11)); 
+    leg1Array3.push(new THREE.Mesh(geoArray12[i],matArray12));
+    leg2Array3.push(new THREE.Mesh(geoArray12[i],matArray13));
+    shoesArray3.push(new THREE.Mesh(geoArray14[i],matArray14));
+    hand1Array3.push(new THREE.Mesh(geoArray15[i],matArray15));
+    hand2Array3.push(new THREE.Mesh(geoArray16[i],matArray16));	
+    palm1Array3.push(new THREE.Mesh(geoArray17[i],matArray17));
+    palm2Array3.push(new THREE.Mesh(geoArray18[i],matArray18));
+    beardArray3.push(new THREE.Mesh(geoArray19[i],matArray19));
+    mouthArray3.push(new THREE.Mesh(geoArray20[i],matArray20));
+    mouth2Array3.push(new THREE.Mesh(geoArray21[i],matArray21));
+	shoulder1Array3.push(new THREE.Mesh(geoArray22[i],matArray22));
+	shoulder2Array3.push(new THREE.Mesh(geoArray23[i],matArray23));
+	joint1Array3.push(new THREE.Mesh(geoArray24[i],matArray24));
+	joint2Array3.push(new THREE.Mesh(geoArray25[i],matArray25));
+
+    headArray3[i].position.y = 11;
+    headArray3[i].position.x = -78;
+    headArray3[i].position.z =(4*i)-30;
+
+	hat1Array3[i].position.y = 0.9;
+    hat2Array3[i].position.y = 1;
+    glass1Array3[i].position.x=-0.5
+    glass1Array3[i].position.y=0.2;
+    glass1Array3[i].position.z=0.9;
+	glass2Array3[i].position.x=0.5
+    glass2Array3[i].position.y=0.2;
+    glass2Array3[i].position.z=0.9;
+  	eye1Array3[i].position.z=0.1;
+  	eye2Array3[i].position.z=0.1;
+  	eyelineArray3[i].position.y=0.15;
+  	eyelineArray3[i].position.z=0.9;
+  	bodyArray3[i].position.y=-1.9;
+  	bodyArray3[i].position.z=-0.2;
+  	bodylineArray3[i].position.z=1;
+  	bodydownArray3[i].position.y=-1.3;
+  	leg1Array3[i].position.x=-0.35;
+  	leg1Array3[i].position.y=-1;
+  	leg2Array3[i].position.x=0.35;
+  	leg2Array3[i].position.y=-1;
+  	shoesArray3[i].position.x=0.3;
+  	shoesArray3[i].position.y=-1;
+  	shoesArray3[i].position.z=0.5;
+  	hand1Array3[i].position.x=-0.25;
+  	hand1Array3[i].position.y=-0.8;
+	hand2Array3[i].position.x=0.25;
+  	hand2Array3[i].position.y=-0.8;
+  	palm1Array3[i].position.y=-1.4;
+  	palm2Array3[i].position.y=-1.4;
+  	beardArray3[i].position.y=-0.6;
+	beardArray3[i].position.z=0.9;
+	mouthArray3[i].position.y=-0.6;
+	mouthArray3[i].position.z=1;
+	mouth2Array3[i].position.z=0.1;
+	shoulder1Array3[i].position.y=0.8;
+	shoulder1Array3[i].position.x=-1.4;
+	shoulder2Array3[i].position.y=0.8;
+	shoulder2Array3[i].position.x=1.4;
+	joint1Array3[i].position.x=-1.4;
+	joint1Array3[i].position.y=0.8;
+	joint2Array3[i].position.x=1.4;
+	joint2Array3[i].position.y=0.8;
+
+    scene.add(headArray3[i]);
+    scene.add(hat1Array3[i]);
+    scene.add(hat2Array3[i]);
+    scene.add(glass1Array3[i]);
+    scene.add(glass2Array3[i]);
+    scene.add(eye1Array3[i]);
+    scene.add(eye2Array3[i]);
+    scene.add(eyelineArray3[i]);
+    scene.add(bodyArray3[i]);
+    scene.add(bodylineArray3[i]);
+    scene.add(bodydownArray3[i]);
+    scene.add(leg1Array3[i]);
+    scene.add(leg2Array3[i]);
+	scene.add(shoesArray3[i]);
+	scene.add(hand1Array3[i]);
+	scene.add(hand2Array3[i]);
+	scene.add(palm1Array3[i]);
+	scene.add(palm2Array3[i]);
+	scene.add(beardArray3[i]);
+	scene.add(mouthArray3[i]);
+	scene.add(mouth2Array3[i]);
+	scene.add(shoulder1Array3[i]);
+	scene.add(shoulder2Array3[i]);
+	scene.add(joint1Array3[i]);
+	scene.add(joint2Array3[i]);
+	
+    hat1Array3[i].parent=headArray3[i];
+    hat2Array3[i].parent=headArray3[i];
+	glass1Array3[i].parent=headArray3[i];
+	glass2Array3[i].parent=headArray3[i];
+	eye1Array3[i].parent=glass1Array3[i];
+	eye2Array3[i].parent=glass2Array3[i];
+	eyelineArray3[i].parent=headArray3[i];
+	bodyArray3[i].parent=headArray3[i];
+	bodylineArray3[i].parent=bodyArray3[i];
+	bodydownArray3[i].parent=bodyArray3[i];
+	leg1Array3[i].parent=bodydownArray3[i];
+	leg2Array3[i].parent=bodydownArray3[i];
+	shoesArray3[i].parent=leg1Array3[i];
+	hand1Array3[i].parent=joint1Array3[i];
+	hand2Array3[i].parent=joint2Array3[i];
+	palm1Array3[i].parent=hand1Array3[i];
+	palm2Array3[i].parent=hand2Array3[i];
+	beardArray3[i].parent=headArray3[i];
+	mouthArray3[i].parent=headArray3[i];
+	mouth2Array3[i].parent=mouthArray3[i];
+	shoulder1Array3[i].parent=bodyArray3[i];
+	shoulder2Array3[i].parent=bodyArray3[i];
+	joint1Array3[i].parent=bodyArray3[i];
+	joint2Array3[i].parent=bodyArray3[i];
+
+headArray3[i].rotation.y =Math.PI/2;
+shoulder1Array3[i].rotation.z=Math.PI/2;
+shoulder2Array3[i].rotation.z=Math.PI/2;
+
+
+}
+var headArray4 = [];
+var hat1Array4 = [];
+var hat2Array4 = [];
+var glass1Array4 = [];
+var glass2Array4 = [];
+var eye1Array4 = [];
+var eye2Array4 = [];
+var eyelineArray4 = [];
+var bodyArray4 = [];
+var bodylineArray4 = [];
+var bodydownArray4 = [];
+var leg1Array4 = [];
+var leg2Array4 = [];
+var shoesArray4 = [];
+var hand1Array4 = [];
+var hand2Array4 = [];
+var palm1Array4 = [];
+var palm2Array4 = [];
+var beardArray4 = [];
+var mouthArray4 = [];
+var mouth2Array4 = [];
+var shoulder1Array4=[];
+var shoulder2Array4=[];
+var joint1Array4=[];
+var joint2Array4=[];
+
+// Create the particles
+for (var i=0; i<iNumber; i++)
+{
+	
+
+    headArray4.push(new THREE.Mesh(geoArray[i], matArray) );	
+    hat1Array4.push(new THREE.Mesh(geoArray2[i],matArray2));
+    hat2Array4.push(new THREE.Mesh(geoArray3[i],matArray3));
+    glass1Array4.push(new THREE.Mesh(geoArray4[i],matArray4));
+    glass2Array4.push(new THREE.Mesh(geoArray5[i],matArray4)); 
+    eye1Array4.push(new THREE.Mesh(geoArray6[i],matArray6)); 
+    eye2Array4.push(new THREE.Mesh(geoArray7[i],matArray7)); 
+    eyelineArray4.push(new THREE.Mesh(geoArray8[i],matArray8)); 
+    bodyArray4.push(new THREE.Mesh(geoArray9[i],matArray9)); 
+    bodylineArray4.push(new THREE.Mesh(geoArray10[i],matArray10)); 
+    bodydownArray4.push(new THREE.Mesh(geoArray11[i],matArray11)); 
+    leg1Array4.push(new THREE.Mesh(geoArray12[i],matArray12));
+    leg2Array4.push(new THREE.Mesh(geoArray12[i],matArray13));
+    shoesArray4.push(new THREE.Mesh(geoArray14[i],matArray14));
+    hand1Array4.push(new THREE.Mesh(geoArray15[i],matArray15));
+    hand2Array4.push(new THREE.Mesh(geoArray16[i],matArray16));	
+    palm1Array4.push(new THREE.Mesh(geoArray17[i],matArray17));
+    palm2Array4.push(new THREE.Mesh(geoArray18[i],matArray18));
+    beardArray4.push(new THREE.Mesh(geoArray19[i],matArray19));
+    mouthArray4.push(new THREE.Mesh(geoArray20[i],matArray20));
+    mouth2Array4.push(new THREE.Mesh(geoArray21[i],matArray21));
+	shoulder1Array4.push(new THREE.Mesh(geoArray22[i],matArray22));
+	shoulder2Array4.push(new THREE.Mesh(geoArray23[i],matArray23));
+	joint1Array4.push(new THREE.Mesh(geoArray24[i],matArray24));
+	joint2Array4.push(new THREE.Mesh(geoArray25[i],matArray25));
+
+    headArray4[i].position.y = 15.5;
+    headArray4[i].position.x = -87;
+    headArray4[i].position.z =(4*i)-30;
+
+	hat1Array4[i].position.y = 0.9;
+    hat2Array4[i].position.y = 1;
+    glass1Array4[i].position.x=-0.5
+    glass1Array4[i].position.y=0.2;
+    glass1Array4[i].position.z=0.9;
+	glass2Array4[i].position.x=0.5
+    glass2Array4[i].position.y=0.2;
+    glass2Array4[i].position.z=0.9;
+  	eye1Array4[i].position.z=0.1;
+  	eye2Array4[i].position.z=0.1;
+  	eyelineArray4[i].position.y=0.15;
+  	eyelineArray4[i].position.z=0.9;
+  	bodyArray4[i].position.y=-1.9;
+  	bodyArray4[i].position.z=-0.2;
+  	bodylineArray4[i].position.z=1;
+  	bodydownArray4[i].position.y=-1.3;
+  	leg1Array4[i].position.x=-0.35;
+  	leg1Array4[i].position.y=-1;
+  	leg2Array4[i].position.x=0.35;
+  	leg2Array4[i].position.y=-1;
+  	shoesArray4[i].position.x=0.3;
+  	shoesArray4[i].position.y=-1;
+  	shoesArray4[i].position.z=0.5;
+  	hand1Array4[i].position.x=-0.25;
+  	hand1Array4[i].position.y=-0.8;
+	hand2Array4[i].position.x=0.25;
+  	hand2Array4[i].position.y=-0.8;
+  	palm1Array4[i].position.y=-1.4;
+  	palm2Array4[i].position.y=-1.4;
+  	beardArray4[i].position.y=-0.6;
+	beardArray4[i].position.z=0.9;
+	mouthArray4[i].position.y=-0.6;
+	mouthArray4[i].position.z=1;
+	mouth2Array4[i].position.z=0.1;
+	shoulder1Array4[i].position.y=0.8;
+	shoulder1Array4[i].position.x=-1.4;
+	shoulder2Array4[i].position.y=0.8;
+	shoulder2Array4[i].position.x=1.4;
+	joint1Array4[i].position.x=-1.4;
+	joint1Array4[i].position.y=0.8;
+	joint2Array4[i].position.x=1.4;
+	joint2Array4[i].position.y=0.8;
+
+    scene.add(headArray4[i]);
+    scene.add(hat1Array4[i]);
+    scene.add(hat2Array4[i]);
+    scene.add(glass1Array4[i]);
+    scene.add(glass2Array4[i]);
+    scene.add(eye1Array4[i]);
+    scene.add(eye2Array4[i]);
+    scene.add(eyelineArray4[i]);
+    scene.add(bodyArray4[i]);
+    scene.add(bodylineArray4[i]);
+    scene.add(bodydownArray4[i]);
+    scene.add(leg1Array4[i]);
+    scene.add(leg2Array4[i]);
+	scene.add(shoesArray4[i]);
+	scene.add(hand1Array4[i]);
+	scene.add(hand2Array4[i]);
+	scene.add(palm1Array4[i]);
+	scene.add(palm2Array4[i]);
+	scene.add(beardArray4[i]);
+	scene.add(mouthArray4[i]);
+	scene.add(mouth2Array4[i]);
+	scene.add(shoulder1Array4[i]);
+	scene.add(shoulder2Array4[i]);
+	scene.add(joint1Array4[i]);
+	scene.add(joint2Array4[i]);
+	
+    hat1Array4[i].parent=headArray4[i];
+    hat2Array4[i].parent=headArray4[i];
+	glass1Array4[i].parent=headArray4[i];
+	glass2Array4[i].parent=headArray4[i];
+	eye1Array4[i].parent=glass1Array4[i];
+	eye2Array4[i].parent=glass2Array4[i];
+	eyelineArray4[i].parent=headArray4[i];
+	bodyArray4[i].parent=headArray4[i];
+	bodylineArray4[i].parent=bodyArray4[i];
+	bodydownArray4[i].parent=bodyArray4[i];
+	leg1Array4[i].parent=bodydownArray4[i];
+	leg2Array4[i].parent=bodydownArray4[i];
+	shoesArray4[i].parent=leg1Array4[i];
+	hand1Array4[i].parent=joint1Array4[i];
+	hand2Array4[i].parent=joint2Array4[i];
+	palm1Array4[i].parent=hand1Array4[i];
+	palm2Array4[i].parent=hand2Array4[i];
+	beardArray4[i].parent=headArray4[i];
+	mouthArray4[i].parent=headArray4[i];
+	mouth2Array4[i].parent=mouthArray4[i];
+	shoulder1Array4[i].parent=bodyArray4[i];
+	shoulder2Array4[i].parent=bodyArray4[i];
+	joint1Array4[i].parent=bodyArray4[i];
+	joint2Array4[i].parent=bodyArray4[i];
+
+headArray4[i].rotation.y =Math.PI/2;
+shoulder1Array4[i].rotation.z=Math.PI/2;
+shoulder2Array4[i].rotation.z=Math.PI/2;
+
+
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////HOLES GAME//////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,8 +1237,8 @@ groundBody.position.y = -1.5;
 world.add(groundBody);
 
 // add a ground plane to the scene
-var geometry = new THREE.PlaneGeometry(200,200,1,1);   // xy plane
-var gMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+var geometry = new THREE.PlaneGeometry(400,400,1,1);   // xy plane
+var gMaterial = new THREE.MeshBasicMaterial( {color: 0x12BD0A, side: THREE.DoubleSide} );
 var plane = new THREE.Mesh( geometry, gMaterial );
 plane.position.set(0, -1.5, 0);
 plane.rotation.set(Math.PI/2, 0, 0);
@@ -291,36 +1248,10 @@ scene.add( plane );
 var backWallG2C = new CANNON.Plane();
 var groundBodyG2C = new CANNON.Body({ mass: 0});
 groundBodyG2C.addShape(backWallG2C);
-groundBodyG2C.position.x = -50;
-groundBodyG2C.position.y = 8;
-groundBodyG2C.position.z = -28;
+groundBodyG2C.position.x = 0;
+groundBodyG2C.position.y = 15;
+groundBodyG2C.position.z = -40;
 world.add(groundBodyG2C);
-
-// add a ground backWallG2 to the scene
-var gbackWallG2 = new THREE.PlaneGeometry(30,20,1,1);   // xy backWallG2
-var mbackWallG2 = new THREE.MeshBasicMaterial( {color: 0xBB3300, side: THREE.DoubleSide, transparent: true, opacity: 0.5, metalness: 1.0, roughness: 0.8} );
-var backWallG2C = new THREE.Mesh( gbackWallG2, mbackWallG2 );
-backWallG2C.position.set(-50, 8, -28);
-scene.add( backWallG2C );
-
-//////////////SIDEWALL GAME2///////////////
-// var sideWallG2C = new CANNON.Plane();
-// var groundBodysideG2C = new CANNON.Body({ mass: 0});
-// groundBodysideG2C.addShape(sideWallG2C);
-// //groundBodysideG2C.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0),-Math.PI/2);
-// /////
-// groundBodysideG2C.position.x = -65;
-// groundBodysideG2C.position.y = 8;
-// groundBodysideG2C.position.z = -15.5;
-// world.add(groundBodysideG2C);
-
-// add a ground sideWallG2 to the scene
-var gsideWallG2 = new THREE.PlaneGeometry(25,20,1,1);   // xy sideWallG2
-var msideWallG2 = new THREE.MeshBasicMaterial( {color: 0xBB3300, side: THREE.DoubleSide, transparent: true, opacity: 0.5, metalness: 1.0, roughness: 0.8} );
-var sideWallG2C = new THREE.Mesh( gsideWallG2, msideWallG2 );
-sideWallG2C.position.set(-65, 8, -15.5);
-sideWallG2C.rotation.set(0, Math.PI/2, 0);
-scene.add( sideWallG2C );
 
 var timeStep = 1.0 / 60.0;   // seconds
 
@@ -351,7 +1282,7 @@ var sphere1 = new THREE.Mesh(
 var sphereShape = new CANNON.Sphere(radius);    // Step 1
 var sphereBody = new CANNON.Body({mass: mass}); // Step 2
 sphereBody.addShape(sphereShape);
-sphereBody.position.set(-50, 25, -20.9);
+sphereBody.position.set(3, 10, -27.9);
 world.add(sphereBody); 							// Step 3
 
 /////////////////   TORUS TARGETS  //////////////////////////  
@@ -375,7 +1306,7 @@ var torus = new THREE.Mesh(
    new THREE.TorusGeometry(radius0, tube, radialSegments, tubularSegments),
    torusMaterial);
    	torus.rotation.set(Math.PI/2, 0, 0);
- 	torus.position.set(-50, -1.6, -12);
+ 	torus.position.set(0, -1.5, -12);
 	scene.add(torus);
 
 //  torus cannon body
@@ -383,7 +1314,7 @@ var torusShape = new CANNON.Trimesh.createTorus(radius0, tube, radialSegments, t
 var torusBody = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody.addShape(torusShape);
 torusBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody.position.set(-50, -1.6, -12);
+torusBody.position.set(0, -1.5, -12);
 world.add(torusBody);                          // Step 3
 
 //torus bottom for collision feedback
@@ -391,7 +1322,7 @@ var gDetectCir = new THREE.CircleGeometry( 5, 32 );
 var mDetectCir = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir = new THREE.Mesh( gDetectCir, mDetectCir );
 detectCir.rotation.x = Math.PI / 2;
-detectCir.position.set(-50, -1.6, -12);
+detectCir.position.set(0, -1.5, -12);
 scene.add( detectCir );
 
 //-1-
@@ -400,7 +1331,7 @@ var torus01 = new THREE.Mesh(
    new THREE.TorusGeometry(radius1, tube1, radialSegments1, tubularSegments1),
    torusMaterial1);
    	torus01.rotation.set(Math.PI/2, 0, 0);
- 	torus01.position.set(-41, -1.6, -8);
+ 	torus01.position.set(9, -1.25, -8);
 	scene.add(torus01);
 
 //torus cannon body
@@ -408,7 +1339,7 @@ var torusShape1 = new CANNON.Trimesh.createTorus(radius1, tube1, radialSegments1
 var torusBody1 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody1.addShape(torusShape1);
 torusBody1.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody1.position.set(-41, -1.6, -8);
+torusBody1.position.set(9, -1.25, -8);
 world.add(torusBody1);                          // Step 3
 
 //torus bottom for collision feedback
@@ -416,7 +1347,7 @@ var gDetectCir1 = new THREE.CircleGeometry( 3, 32 );
 var mDetectCir1 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir1 = new THREE.Mesh( gDetectCir1, mDetectCir1 );
 detectCir1.rotation.x = Math.PI / 2;
-detectCir1.position.set(-41, -1.6, -8);
+detectCir1.position.set(9, -1.25, -8);
 scene.add( detectCir1 );
 
 //-2-
@@ -425,7 +1356,7 @@ var torus02 = new THREE.Mesh(
    new THREE.TorusGeometry(radius2, tube2, radialSegments2, tubularSegments2),
    torusMaterial2);
    	torus02.rotation.set(Math.PI/2, 0, 0);
- 	torus02.position.set(-59.5, -1.6, -6);
+ 	torus02.position.set(-9.5, -1.25, -6);
 	scene.add(torus02);
 
 //torus cannon body
@@ -433,7 +1364,7 @@ var torusShape2 = new CANNON.Trimesh.createTorus(radius2, tube2, radialSegments2
 var torusBody2 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody2.addShape(torusShape2);
 torusBody2.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody2.position.set(-59.5, -1.6, -6);
+torusBody2.position.set(-9.5, -1.25, -6);
 world.add(torusBody2);                          // Step 3
 
 //torus bottom for collision feedback
@@ -441,7 +1372,7 @@ var gDetectCir2 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir2 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir2 = new THREE.Mesh( gDetectCir2, mDetectCir2 );
 detectCir2.rotation.x = Math.PI / 2;
-detectCir2.position.set(-59.5, -1.6, -6);
+detectCir2.position.set(-9.5, -1.25, -6);
 scene.add( detectCir2 );
 
 //-3-
@@ -450,7 +1381,7 @@ var torus03 = new THREE.Mesh(
    new THREE.TorusGeometry(radius3, tube3, radialSegments3, tubularSegments3),
    torusMaterial3);
    	torus03.rotation.set(Math.PI/2, 0, 0);
- 	torus03.position.set(-59.5, -1.6, -19);
+ 	torus03.position.set(-9.5, -1.25, -19);
 	scene.add(torus03);
 
 //torus cannon body
@@ -458,7 +1389,7 @@ var torusShape3 = new CANNON.Trimesh.createTorus(radius3, tube3, radialSegments3
 var torusBody3 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody3.addShape(torusShape3);
 torusBody3.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody3.position.set(-59.5, -1.6, -19);
+torusBody3.position.set(-9.5, -1.25, -19);
 world.add(torusBody3);                          // Step 3
 
 //torus bottom for collision feedback
@@ -466,7 +1397,7 @@ var gDetectCir3 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir3 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir3 = new THREE.Mesh( gDetectCir3, mDetectCir3 );
 detectCir3.rotation.x = Math.PI / 2;
-detectCir3.position.set(-59.5, -1.6, -19);
+detectCir3.position.set(-9.5, -1.25, -19);
 scene.add( detectCir3 );
 
 //-4-
@@ -475,7 +1406,7 @@ var torus04 = new THREE.Mesh(
    new THREE.TorusGeometry(radius4, tube4, radialSegments4, tubularSegments4),
    torusMaterial4);
    	torus04.rotation.set(Math.PI/2, 0, 0);
- 	torus04.position.set(-42.5, -1.6, -15);
+ 	torus04.position.set(7.5, -1.25, -15);
 	scene.add(torus04);
 
 //torus cannon body
@@ -483,7 +1414,7 @@ var torusShape4 = new CANNON.Trimesh.createTorus(radius4, tube4, radialSegments4
 var torusBody4 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody4.addShape(torusShape4);
 torusBody4.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody4.position.set(-42.5, -1.6, -15);
+torusBody4.position.set(7.5, -1.25, -15);
 world.add(torusBody4);                          // Step 3
 
 //torus bottom for collision feedback
@@ -491,7 +1422,7 @@ var gDetectCir4 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir4 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir4 = new THREE.Mesh( gDetectCir4, mDetectCir4 );
 detectCir4.rotation.x = Math.PI / 2;
-detectCir4.position.set(-42.5, -1.6, -15);
+detectCir4.position.set(7.5, -1.25, -15);
 scene.add( detectCir4 );
 
 //-5-
@@ -500,7 +1431,7 @@ var torus05 = new THREE.Mesh(
    new THREE.TorusGeometry(radius5, tube5, radialSegments5, tubularSegments5),
    torusMaterial5);
    	torus05.rotation.set(Math.PI/2, 0, 0);
- 	torus05.position.set(-46.5, -1.6, -23);
+ 	torus05.position.set(4.5, -1.25, -23);
 	scene.add(torus05);
 
 //torus cannon body
@@ -508,7 +1439,7 @@ var torusShape5 = new CANNON.Trimesh.createTorus(radius5, tube5, radialSegments5
 var torusBody5 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody5.addShape(torusShape5);
 torusBody5.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody5.position.set(-46.5, -1.6, -23);
+torusBody5.position.set(4.5, -1.25, -23);
 world.add(torusBody5);                          // Step 3
 
 //torus bottom for collision feedback
@@ -516,7 +1447,7 @@ var gDetectCir5 = new THREE.CircleGeometry( 5, 32 );
 var mDetectCir5 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir5 = new THREE.Mesh( gDetectCir5, mDetectCir5 );
 detectCir5.rotation.x = Math.PI / 2;
-detectCir5.position.set(-46.5, -1.6, -23);
+detectCir5.position.set(4.5, -1.25, -23);
 scene.add( detectCir5 );
 
 //-6-
@@ -525,7 +1456,7 @@ var torus06 = new THREE.Mesh(
    new THREE.TorusGeometry(radius6, tube6, radialSegments6, tubularSegments6),
    torusMaterial6);
    	torus06.rotation.set(Math.PI/2, 0, 0);
- 	torus06.position.set(-52.8, -1.6, -19);
+ 	torus06.position.set(-2.2, -1.25, -20);
 	scene.add(torus06);
 
 //torus cannon body
@@ -533,7 +1464,7 @@ var torusShape6 = new CANNON.Trimesh.createTorus(radius6, tube6, radialSegments6
 var torusBody6 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody6.addShape(torusShape6);
 torusBody6.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody6.position.set(-52.8, -1.6, -20);
+torusBody6.position.set(-2.2, -1.25, -20);
 world.add(torusBody6);                          // Step 3
 
 //torus bottom for collision feedback
@@ -541,7 +1472,7 @@ var gDetectCir6 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir6 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir6 = new THREE.Mesh( gDetectCir6, mDetectCir6 );
 detectCir6.rotation.x = Math.PI / 2;
-detectCir6.position.set(-52.8, -1.6, -20);
+detectCir6.position.set(-2.2, -1.25, -20);
 scene.add( detectCir6 );
 
 //-7-
@@ -550,7 +1481,7 @@ var torus07 = new THREE.Mesh(
    new THREE.TorusGeometry(radius7, tube7, radialSegments7, tubularSegments7),
    torusMaterial7);
    	torus07.rotation.set(Math.PI/2, 0, 0);
- 	torus07.position.set(-58, -1.6, -12);
+ 	torus07.position.set(-8, -1.25, -12);
 	scene.add(torus07);
 
 //torus cannon body
@@ -558,7 +1489,7 @@ var torusShape7 = new CANNON.Trimesh.createTorus(radius7, tube7, radialSegments7
 var torusBody7 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody7.addShape(torusShape7);
 torusBody7.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody7.position.set(-58, -1.6, -12);
+torusBody7.position.set(-8, -1.25, -12);
 world.add(torusBody7);                          // Step 3
 
 //torus bottom for collision feedback
@@ -566,7 +1497,7 @@ var gDetectCir7 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir7 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir7 = new THREE.Mesh( gDetectCir7, mDetectCir7 );
 detectCir7.rotation.x = Math.PI / 2;
-detectCir7.position.set(-58, -1.6, -12);
+detectCir7.position.set(-8, -1.25, -12);
 scene.add( detectCir7 );
 
 //-8-
@@ -575,7 +1506,7 @@ var torus08 = new THREE.Mesh(
    new THREE.TorusGeometry(radius8, tube8, radialSegments8, tubularSegments8),
    torusMaterial8);
    	torus08.rotation.set(Math.PI/2, 0, 0);
- 	torus08.position.set(-62.5, -1.6, -12);
+ 	torus08.position.set(-12.5, -1.25, -12);
 	scene.add(torus08);
 
 //torus cannon body
@@ -583,7 +1514,7 @@ var torusShape8 = new CANNON.Trimesh.createTorus(radius8, tube8, radialSegments8
 var torusBody8 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody8.addShape(torusShape8);
 torusBody8.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody8.position.set(-62.5, -1.6, -12);
+torusBody8.position.set(-12.2, -1.25, -12);
 world.add(torusBody8);                          // Step 3
 
 //torus bottom for collision feedback
@@ -591,7 +1522,7 @@ var gDetectCir8 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir8 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir8 = new THREE.Mesh( gDetectCir8, mDetectCir8 );
 detectCir8.rotation.x = Math.PI / 2;
-detectCir8.position.set(-62.5, -1.6, -12);
+detectCir8.position.set(-12.2, -1.25, -12);
 scene.add( detectCir8 );
 
 //-9-
@@ -600,7 +1531,7 @@ var torus09 = new THREE.Mesh(
    new THREE.TorusGeometry(radius9, tube9, radialSegments9, tubularSegments9),
    torusMaterial9);
    	torus09.rotation.set(Math.PI/2, 0, 0);
- 	torus09.position.set(-36.5, -1.6, -15);
+ 	torus09.position.set(13.5, -1.25, -15);
 	scene.add(torus09);
 
 //torus cannon body
@@ -608,7 +1539,7 @@ var torusShape9 = new CANNON.Trimesh.createTorus(radius9, tube9, radialSegments9
 var torusBody9 = new CANNON.Body({mass1: mass1}); // Step 2
 torusBody9.addShape(torusShape9);
 torusBody9.quaternion.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
-torusBody9.position.set(-36.5, -1.6, -15);
+torusBody9.position.set(13.5, -1.25, -15);
 world.add(torusBody9);                          // Step 3
 
 //torus bottom for collision feedback
@@ -616,9 +1547,8 @@ var gDetectCir9 = new THREE.CircleGeometry( 4, 32 );
 var mDetectCir9 = new THREE.MeshBasicMaterial( { color: 0x4365F5 } );
 var detectCir9 = new THREE.Mesh( gDetectCir9, mDetectCir9 );
 detectCir9.rotation.x = Math.PI / 2;
-detectCir9.position.set(-36.5, -1.6, -15 );
+detectCir9.position.set(13.5, -1.25, -15 );
 scene.add( detectCir9 );
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -696,6 +1626,10 @@ function animate()
 {
 	requestAnimationFrame(animate);
 	
+
+	boardSign.rotation.x += Math.PI/150;
+	
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////WEAPON ANIMATIONS////////////////////////////////////////////
@@ -703,10 +1637,10 @@ function animate()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//move targets using sigmoid functions at different speeds
-	targetTorso.position.x = Math.sin(iFrame/120) * 25 + 50;
-	targetTorso2.position.x = Math.cos(iFrame/60) * 25 + 50;
-	targetTorso3.position.x = Math.sin(iFrame/80) * 25 + 50;
-	targetTorso4.position.x = Math.cos(iFrame/40) * 25 + 50;
+	targetTorso.position.x = Math.sin(iFrame/120) * 25 ;
+	targetTorso2.position.x = Math.cos(iFrame/60) * 25 ;
+	targetTorso3.position.x = Math.sin(iFrame/80) * 25 ;
+	targetTorso4.position.x = Math.cos(iFrame/40) * 25 ;
 	
 	targetTorso.position.y = Math.cos(iFrame/100) * 10 + 15;
 	targetTorso2.position.y = Math.sin(iFrame/100) * 10 + 15;
@@ -730,7 +1664,7 @@ function animate()
 	else
 		targetTorso4.rotation.y +=0.1;
 
-//if weapon is fired, create bullets for the gun
+//if weapon is fired, create bullets for the gun on every 5 frames
 	if(fire && iFrame%5==0)
 {
 	let bulletRH = new THREE.Mesh(new THREE.SphereGeometry(0.25, 4, 4), new THREE.MeshBasicMaterial({color: "blue"}));
@@ -745,6 +1679,7 @@ function animate()
 	scene.add(bulletLH);
 	bulletsLH.push(bulletLH);
 	
+	//play sound when fired
 	sound.muted = false;
 	sound.playbackRate = 6;
 	sound.play();
@@ -908,7 +1843,7 @@ else
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////TORUS RING GAME ANIMATIONS////////////////////////////////////////////
+///////////////////////////////////////HOLES RING GAME ANIMATIONS////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -1086,7 +2021,6 @@ cube.rotation.y += 0.006;
         torus09.material.color.setHex(0x89FFA9);
     }
 
-	
 /*
 
 // get json
@@ -1200,6 +2134,7 @@ var meshFilteredLHPos = new THREE.Vector3(0,0,0);
 // The getBodies callback function: called once every time kinect obtain a frame
 function getBodies(skeleton) 
 { 
+
 	//tracking geometry onto joints
 	meshLH.position.x = skeleton.joints[kinectron.HANDLEFT].cameraX;
 	meshLH.position.y = skeleton.joints[kinectron.HANDLEFT].cameraY;
@@ -1319,10 +2254,9 @@ function getBodies(skeleton)
 	weaponRH.position.copy(meshFilteredRHPos);
 	weaponLH.position.copy(meshFilteredLHPos);
 
-	
 	//FPS camera 
 	camera.position.set(skeleton.joints[kinectron.HEAD].cameraX,1,skeleton.joints[kinectron.HEAD].cameraZ+ 5);
-	camera.lookAt(skeleton.joints[kinectron.HEAD].cameraX, skeleton.joints[kinectron.HEAD].cameraY +0.75, skeleton.joints[kinectron.HEAD].cameraZ);
+	//camera.lookAt(skeleton.joints[kinectron.HEAD].cameraX, skeleton.joints[kinectron.HEAD].cameraY +0.75, skeleton.joints[kinectron.HEAD].cameraZ);
 	
 	camera.quaternion.set(skeleton.joints[kinectron.NECK].orientationX,
 	skeleton.joints[kinectron.NECK].orientationY,
@@ -1366,6 +2300,7 @@ function getBodies(skeleton)
     }
 	else
 		fire = false;
+	
 
 }
 
@@ -1397,5 +2332,4 @@ function readTextFile(file, callback) {
 }
 
 */
-
 
