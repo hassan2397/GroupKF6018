@@ -30,7 +30,7 @@ var lightAmbient = new THREE.AmbientLight( 0x888888 );
 
 //skybox
   
- var imagePrefix = "images/hills/";
+ var imagePrefix = "hills/";
  var directions  = ["px", "nx", "py", "ny", "pz", "nz"];
  var imageSuffix = ".png";
    
