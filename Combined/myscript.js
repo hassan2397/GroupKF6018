@@ -401,16 +401,20 @@ cylinder3.parent = cube;
 var listener = new THREE.AudioListener();
 camera.add( listener );
 // create a global audio source
-var sound = new THREE.Audio( listener );
-// load a sound and set it as the Audio object's buffer
+var sound5 = new THREE.Audio( listener );
+
+// play a sound when the crowd wave their hands
 var audioLoader = new THREE.AudioLoader();
-audioLoader.load( 'CrowdEffect.ogg', function( buffer ) {
-	sound.setBuffer( buffer );
-	sound.setLoop( true );
-	sound.setVolume( 0.5 );
+audioLoader.load( 'sounds/CrowdEffect.ogg', function( buffer ) {
+	sound5.setBuffer( buffer );
+	sound5.setLoop( true );
+	sound5.setVolume( 0.5 );
 
 });
-sound.play();
+
+
+	
+
 
 var geostairs1 = new THREE.BoxGeometry( 7, 10, 80 );
 var matstairs1 = new THREE.MeshBasicMaterial( {color: 0x7E5353} );
@@ -2463,9 +2467,13 @@ function getBodies(skeleton)
 	if (fHandDistance>1.4) // Arm spreading
 	{
 	     armsSpread=true;
+	     sound5.muted = false;
+	sound5.playbackRate = 6;
+	sound5.play();
 	}
 	else
 	     armsSpread=false;
+	     sound5.muted = false;
 
 }
 
